@@ -1,7 +1,7 @@
-import { createBrowserRouter } from 'react-router-dom';
-import BasicLayout from '../layouts/BasicLayout';
-import Workspace from '../pages/workspace/workspace';
-import Home from '../pages/home/home';
+import { createBrowserRouter } from 'react-router-dom'
+import BasicLayout from '../layouts/BasicLayout'
+import Workspace from '../pages/workspace/workspace'
+import Home from '../pages/home/home'
 
 export const router = createBrowserRouter([
   {
@@ -12,4 +12,4 @@ export const router = createBrowserRouter([
       { path: 'workspace', element: <Workspace /> },
     ],
   },
-]);
+])

@@ -7,7 +7,7 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores(['dist/**', 'coverage/**', '.vite/**']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
@@ -20,6 +20,6 @@ export default defineConfig([
       globals: globals.browser,
     },
   },
-  
+
   eslintPluginPrettierRecommended,
 ])

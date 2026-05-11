@@ -1,11 +1,11 @@
-import React from 'react';
-import { Outlet } from 'react-router-dom';
+import React from 'react'
+import { Outlet } from 'react-router-dom'
 
 const BasicLayout: React.FC = () => {
-    return (
-        <div>
-            <Outlet />
-        </div>
-    );
-};
-export default BasicLayout;
+  return (
+    <div>
+      <Outlet />
+    </div>
+  )
+}
+export default BasicLayout
