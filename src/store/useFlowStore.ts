@@ -24,7 +24,7 @@ export const useFlowStore = create<FlowState>((set) => ({
 
   // 异步请求也能直接写在这里，不用像 Dva 那样写 Generator 函数
   fetchInitialData: async () => {
-    // const res = await api.getFlowData(taskIdFromCaller);
+    // const res = await api.getFlowData(taskId);
     // set({ nodes: res.nodes, edges: res.edges });
   },
 }))

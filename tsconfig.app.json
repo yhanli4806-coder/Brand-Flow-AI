@@ -7,10 +7,8 @@
     "module": "esnext",
     "types": ["vite/client"],
     "skipLibCheck": true,
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "@@/*": ["./src/.umi/*"]
+      "@/*": ["./src/*"]
     },
 
     /* Bundler mode */
@@ -28,3 +26,4 @@
   },
   "include": ["src"]
 }
+
