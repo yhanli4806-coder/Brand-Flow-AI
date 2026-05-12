@@ -7,12 +7,18 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
 
 export default defineConfig([
-  globalIgnores(['dist/**', 'coverage/**', '.vite/**']),
+  globalIgnores([
+    '**/node_modules/**',
+    '**/dist/**',
+    '**/coverage/**',
+    '**/.vite/**',
+    '**/.turbo/**',
+  ]),
   {
-    files: ['**/*.{ts,tsx}'],
+    files: ['apps/web/**/*.{ts,tsx}'],
     extends: [
       js.configs.recommended,
-      tseslint.configs.recommended,
+      ...tseslint.configs.recommended,
       reactHooks.configs.flat.recommended,
       reactRefresh.configs.vite,
     ],
@@ -20,6 +26,12 @@ export default defineConfig([
       globals: globals.browser,
     },
   },
-
+  {
+    files: ['apps/api/**/*.ts', 'packages/agent/**/*.ts'],
+    extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    languageOptions: {
+      globals: globals.node,
+    },
+  },
   eslintPluginPrettierRecommended,
 ])

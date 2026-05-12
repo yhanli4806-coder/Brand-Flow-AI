@@ -1,6 +1,8 @@
 dist
+**/dist
 node_modules
 coverage
 .vite
+.turbo
 package-lock.json
 Coding.md

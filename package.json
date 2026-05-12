@@ -1,42 +1,24 @@
 {
-  "name": "brand-flow-web",
+  "name": "brand-flow-ai",
   "private": true,
-  "version": "0.0.0",
   "type": "module",
+  "packageManager": "pnpm@10.29.3",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "@ant-design/icons": "^6.2.2",
-    "antd": "^6.3.7",
-    "axios": "^1.16.0",
-    "fabric": "^7.3.1",
-    "react": "^19.2.5",
-    "react-dom": "^19.2.5",
-    "react-router-dom": "^7.15.0",
-    "reactflow": "^11.11.4",
-    "zustand": "^5.0.13"
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@types/node": "^24.12.2",
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^6.0.1",
     "eslint": "^10.2.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.5.0",
-    "less": "^4.6.4",
     "prettier": "^3.8.3",
-    "tailwindcss": "^4.3.0",
+    "turbo": "^2.5.4",
     "typescript": "~6.0.2",
-    "typescript-eslint": "^8.58.2",
-    "vite": "^8.0.10"
+    "typescript-eslint": "^8.58.2"
   }
 }
