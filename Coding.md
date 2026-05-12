@@ -1,59 +1,97 @@
-# Brand-Flow AI 前端代码风格指南
+# Brand-Flow AI 代码规范（全仓）
 
-本指南旨在规范 Brand-Flow AI 项目组的前端代码风格，保证代码的可读性、可维护性和团队协作效率。项目基于 **React + TypeScript + Vite + Zustand + Ant Design** 技术栈。
+本规范适用于 **Brand-Flow AI** 智能图文创作平台的 Monorepo 仓库，覆盖 **`apps/web`**（前端）、**`apps/api`**（NestJS 后端）与 **`packages/agent`**（AI 逻辑库）。目标是：**类型安全、边界清晰、风格一致、便于多人并行开发**。
 
-## 1. 命名规范
+- **包管理**：pnpm workspaces（根目录统一 `pnpm install`）。  
+- **任务编排**：Turborepo（`pnpm dev` / `pnpm build` / `pnpm lint`）。  
+- **静态检查与格式**：根目录 [eslint.config.js](eslint.config.js)（按目录分区）+ [.prettierrc.json](.prettierrc.json)；提交前请在仓库根执行 **`pnpm lint`**。
 
-### 1.1 变量与函数（camelCase）
+---
+
+## 1. 全仓通用约定
+
+### 1.1 命名
+
+| 类型 | 风格 | 示例 |
+|------|------|------|
+| 变量、函数、方法 | `camelCase` | `activeNodeId`、`fetchWorkflowData` |
+| 类、接口、类型、组件、枚举名 | `PascalCase` | `UserService`、`WorkspaceProps`、`NodeStatus` |
+| 常量（配置、魔法数字、环境键名） | `UPPER_SNAKE_CASE` | `DEFAULT_CANVAS_ZOOM`、`MAX_RETRY` |
+
+- 事件处理函数建议使用 **`handle` 前缀**：`handleNodeDragStart`。  
+- 封装 HTTP 或仓库访问的函数建议使用 **动词前缀**：`get` / `fetch` / `query` / `update` / `delete`。
+
+### 1.2 TypeScript
+
+- **禁止滥用 `any`**。未知错误使用 `unknown`，在分支内收窄类型后再使用。  
+- 对外边界（组件 Props、API 入参/出参、Agent 导出函数）必须有 **显式类型**（`interface` / `type`）。  
+- 跨包契约（Web 调用的 DTO、API 暴露给前端的类型、Agent 导出给 API 的类型）优先 **单独类型文件或 DTO 类**，避免隐式结构。
+
+### 1.3 导入顺序（推荐）
+
+块与块之间空一行，顺序如下：
+
+1.  side-effect 导入（若有，如 `reflect-metadata` 仅出现在 API 入口）。  
+2.  外部依赖（`react`、`@nestjs/common`、`zustand` 等）。  
+3.  内部别名路径（Web：`@/…`）。  
+4.  相对路径（同目录组件、样式、本地工具）。
 
 ```typescript
-const [activeNodeId, setActiveNodeId] = useState<string>('');
-const isCanvasLoading = false;
+import { useCallback, useState } from 'react'
+import { Button, message } from 'antd'
 
-// 事件处理函数使用 handle 前缀
-const handleNodeDragStart = (event: React.MouseEvent) => {};
-// API 调用函数使用动词前缀 (get/post/query/update)
-const fetchWorkflowData = async () => {};
+import { useFlowStore } from '@/store/useFlowStore'
+import { runTask } from '@/api/workflow'
+
+import { Toolbar } from './Toolbar'
+import styles from './workspace.module.css'
 ```
 
-### 1.2 组件命名（PascalCase）
+### 1.4 Git 与提交习惯
+
+- 单次提交聚焦单一主题，便于 Code Review。  
+- 不提交 **密钥、Token、本机路径**；敏感配置走环境变量（由后端或部署平台注入）。  
+- 合并前自检：**`pnpm lint`**；涉及类型或构建链路的改动建议本地 **`pnpm build`**。
+
+---
+
+## 2. 前端（`apps/web`）
+
+技术栈：**Vite + React 19 + TypeScript + React Router + Zustand + Ant Design + React Flow + Fabric.js + Axios**（及项目已引入的其余依赖）。
+
+### 2.1 目录职责
+
+| 路径 | 用途 |
+|------|------|
+| `src/pages/` | 页面级视图与业务组合 |
+| `src/layouts/` | 布局壳层 |
+| `src/router/` | 路由表与懒加载配置 |
+| `src/store/` | Zustand 全局状态 |
+| `src/api/` | 对后端 HTTP 的封装（统一入口，避免在组件内散落裸 `axios`） |
+| `src/assets/` | 静态资源 |
+
+路径别名 **`@/*` → `src/*`**（见 `vite.config.ts` / `tsconfig.app.json`）。
+
+### 2.2 组件与类型
+
+推荐使用 **`React.FC<Props>`** 或显式标注返回类型，Props 使用 `interface` 或 `type` 声明。
 
 ```typescript
-const CanvasWorkspace = () => {};
-const NodeConfigPanel = () => {};
-```
-
-### 1.3 常量命名（UPPER_SNAKE_CASE）
-
-```typescript
-export const DEFAULT_CANVAS_ZOOM = 1.5;
-export const MAX_HISTORY_STEPS = 20;
-```
-
-## 2. TypeScript 使用规范
-
-### 2.1 组件与类型定义
-
-统一使用 `React.FC<Props>` 定义函数组件，强制提取 `interface` 或 `type`。
-
-```typescript
-import type { FC, ReactNode } from 'react';
-import type { Node, Edge } from 'reactflow';
+import type { FC, ReactNode } from 'react'
 
 interface WorkspaceProps {
-  taskId: string;
-  children?: ReactNode;
+  taskId: string
+  children?: ReactNode
 }
 
-const Workspace: FC<WorkspaceProps> = ({ taskId, children }) => {
+export const Workspace: FC<WorkspaceProps> = ({ taskId, children }) => {
   // ...
-};
-export default Workspace;
+}
 ```
 
-### 2.2 枚举定义
+### 2.3 枚举
 
-使用 `enum` 定义状态与固定常量组，便于统一维护。
+对有限状态集（如节点运行状态）可使用 `enum` 或 `as const` 对象，团队内需统一一种风格；若使用 `enum`，建议字符串枚举便于序列化。
 
 ```typescript
 export enum NodeStatus {
@@ -64,201 +102,116 @@ export enum NodeStatus {
 }
 ```
 
-## 3. 导入顺序规范
+### 2.4 状态管理（Zustand）
 
-保持统一的导入顺序，模块间空一行，提升代码整洁度。
+- **禁止**引入 Redux/Dva 等传统模式；全局状态放在 **`src/store/`**。  
+- Store 内可写异步逻辑，使用 **`async/await`**；错误需处理，避免吞异常。  
+- 从 Store 取状态时尽量 **按字段 selector** 订阅，减少无关重渲染。
 
-```typescript
-// 1. React 及核心库
-import React, { useState, useEffect, useCallback } from 'react';
-import type { FC } from 'react';
+### 2.5 API 与异步
 
-// 2. 第三方依赖包
-import { Button, message, Modal } from 'antd';
-import { useReactFlow } from 'reactflow';
+- 使用 **`async/await`**，配合 `try / catch / finally`；`catch` 中参数类型为 **`unknown`**，再判断 `instanceof Error` 或业务错误结构。  
+- 用户可见反馈使用 Ant Design `message` / `Modal` 等，与业务错误码约定一致。  
+- Vite 环境变量使用 **`import.meta.env.VITE_*`**，并在类型侧做窄化（如 `as string` 或 zod 校验）。
 
-// 3. 全局状态与接口
-import { useFlowStore } from '@/store/useFlowStore';
-import * as api from '@/api/workflow';
+### 2.6 React Flow 与 Fabric.js
 
-// 4. 自定义组件、工具函数及样式
-import CustomNode from './components/CustomNode';
-import { formatTime } from '@/utils/time';
-import styles from './style.module.css'; // 或 .less
-```
+- **高频画布事件**（拖拽、指针移动）不要直接驱动大范围 React `useState` 或整块 Zustand 更新，避免卡顿。  
+  - React Flow：节点/边数据可进 Zustand，但更新频率高的场景配合 **防抖/节流** 或局部 `useRef`。  
+  - Fabric：**实例挂在 `useRef`**，与 React 树生命周期对齐（卸载时 `dispose`）。  
+- 右侧配置面板等使用 Ant Design **`Form`**，在选中节点变化时 **`setFieldsValue`** / `resetFields`，并配置 `rules` 做校验。
 
-## 4. 状态管理规范（Zustand）
+### 2.7 样式
 
-严禁使用传统的 Redux/Dva 模式。全局状态统一在 `src/store` 目录下使用 Zustand 构建。
+- 优先 **CSS Modules**（`*.module.css` / `*.module.less`），避免全局污染。  
+- 禁止为裸标签写全局样式覆盖 Ant Design/React Flow 内部结构（除非经评审的极少数场景）。
 
-### 4.1 Store 定义模式
+### 2.8 权限与路由
 
-```typescript
-import { create } from 'zustand';
-import type { UserInfo } from '@/types/user';
+- 声明式鉴权组件（示例）：根据 `useUserStore` 中的角色渲染子节点或 `null`。  
+- 路由级守卫与登录重定向逻辑集中在 **`router/`** 或与布局组合，避免在深层页面重复判断。
 
-interface UserState {
-  userInfo: UserInfo | null;
-  token: string | null;
-  // Actions
-  setUserInfo: (info: UserInfo) => void;
-  logout: () => void;
-  fetchProfile: () => Promise<void>;
-}
+---
 
-export const useUserStore = create<UserState>((set, get) => ({
-  userInfo: null,
-  token: localStorage.getItem('token') || null,
+## 3. 后端（`apps/api`）
 
-  setUserInfo: (info) => set({ userInfo: info }),
+技术栈：**NestJS 11 + TypeScript**；数据与队列侧已规划 **MongoDB（Mongoose）、Redis、BullMQ**；向量检索 **Pinecone** 等由配置注入，不在代码库写死密钥。
 
-  logout: () => {
-    localStorage.removeItem('token');
-    set({ userInfo: null, token: null });
-  },
+### 3.1 分层与职责
 
-  // 异步 Action 直接在 Zustand 内处理，不需 Generator (yield)
-  fetchProfile: async () => {
-    try {
-      const res = await api.getUserProfile();
-      if (res.data) set({ userInfo: res.data });
-    } catch (error) {
-      console.error('获取用户信息失败', error);
-    }
-  },
-}));
-```
+| 层次 | 职责 |
+|------|------|
+| `*.controller.ts` | HTTP 路由、状态码、DTO 绑定；**保持薄**，不写复杂 Prompt 或长链路 LLM 逻辑。 |
+| `*.service.ts` | 业务编排、调用 Repository、队列、外部服务；**可** `import` **`@brand-flow/agent`** 并调用其导出函数。 |
+| `*.module.ts` | 依赖装配与模块边界。 |
 
-## 5. API 与异步数据流
+### 3.2 引入 `@brand-flow/agent`
 
-### 5.1 异步请求模式
-
-使用 `async/await` 替代 Promise 链式调用，必须处理 Loading 状态和异常。
+依赖在 `package.json` 中声明为 **`workspace:*`**。在 Service 中：
 
 ```typescript
-const executeWorkflow = async () => {
-  setIsLoading(true);
-  try {
-    const res = await api.runTask({ taskId: '123' });
-    if (res?.success && res.data) {
-      message.success('工作流已启动');
-      updateCanvasNodes(res.data);
-    }
-  } catch (error: any) {
-    message.error(error?.message || '请求失败，请重试');
-  } finally {
-    setIsLoading(false); // 确保解除 loading
-  }
-};
+import { AGENT_VERSION } from '@brand-flow/agent'
 ```
 
-### 5.2 Axios 拦截器与环境配置
+- **禁止**在 Controller 内堆叠大段 Prompt 字符串；与模型相关的文本与链式逻辑放在 **`packages/agent`**。  
+- 运行时代码加载的是 Agent 的 **`main`（编译产物 `dist`）**；若本地仅改 Agent 源码，请执行 **`pnpm --filter @brand-flow/agent build`** 或根目录 **`pnpm build`**。
 
-由于使用 Vite，环境变量需使用 `import.meta.env` 获取。
+### 3.3 Nest 编码习惯
 
-```typescript
-// utils/request.ts
-const BASE_URL = import.meta.env.VITE_BASE_URL as string;
-const instance = axios.create({ baseURL: BASE_URL });
+- 使用 **依赖注入**，避免在 Service 内 `new` 可注入的依赖。  
+- 异步方法返回 **`Promise<T>`** 类型明确化；错误使用 Nest 内置 **`HttpException`** 子类或统一异常过滤器（若后续引入）。  
+- 配置项（数据库 URI、Redis、API Key）从 **`process.env`** 或 `ConfigModule` 读取，**禁止**将生产密钥提交到 Git。
 
-instance.interceptors.response.use(
-  (response) => {
-    const { data } = response;
-    // 业务逻辑错误拦截
-    if (!data.success) {
-      if (data.code === 401) {
-        useUserStore.getState().logout(); // 外部调用 Zustand
-        window.location.href = '/login';
-      } else {
-        message.error(data.message);
-      }
-      return Promise.reject(new Error(data.message));
-    }
-    return data.data; // 直接返回核心数据
-  },
-  (error) => {
-    message.error('网络请求异常');
-    return Promise.reject(error);
-  }
-);
-```
+### 3.4 与前端协作
 
-## 6. 特殊技术栈规范（React Flow & Fabric.js）
+- DTO 与响应结构尽量 **稳定、可版本化**；破坏性变更需同步前端 `src/api` 与类型定义。  
+- CORS、Cookie、鉴权头与 README 中约定保持一致。
 
-### 6.1 画布状态解耦
+---
 
-React Flow 和 Fabric.js 的画布状态（如鼠标移动、频繁拖拽）不要直接存入 React `useState` 或 Zustand 中，避免引发全量渲染。
+## 4. AI 逻辑库（`packages/agent`）
 
-**正确做法：** 使用 `useRef` 存储 Fabric.js 实例；React Flow 的节点数据存入 Zustand，但位置更新通过回调防抖（Debounce）同步。
+技术栈以 **LangChain.js 生态**为主（具体依赖见 `packages/agent/package.json`）；**不包含** Nest / Express / React。
 
-### 6.2 动态表单配置
+### 4.1 边界
 
-右侧属性面板采用 Ant Design `Form`，数据驱动渲染。
+- **只做库**：导出函数、Chain 工厂、Prompt 常量、类型等；**不**在此创建 HTTP 服务器。  
+- **不**在此写与 MongoDB/Redis 强耦合的基础设施代码（由 API 注入客户端或配置后传入纯函数参数更佳）。
 
-```typescript
-const [form] = Form.useForm();
+### 4.2 目录约定
 
-// 初始化或节点切换时重置表单
-useEffect(() => {
-  form.setFieldsValue(activeNode?.data?.config || {});
-}, [activeNode, form]);
+| 路径 | 用途 |
+|------|------|
+| `src/ai-logic/prompts/` | Prompt 模板与系统提示文本 |
+| `src/ai-logic/chains/` | LangChain 链组装、工作流编排入口 |
+| `src/ai-logic/evaluate/`、`src/ai-logic/memory/` | 评估与记忆扩展 |
+| `src/brand/`、`src/generate/` | 品牌域、生成域业务分包 |
+| `src/common/` | 跨模块常量与工具 |
+| `src/index.ts` | **对外稳定导出**；新增导出需考虑 API 兼容性 |
 
-// 规范校验提示
-<Form.Item
-  name="prompt"
-  label="绘图提示词"
-  rules={[{ required: true, message: '提示词不可为空' }]}
->
-  <Input.TextArea placeholder="请输入画面描述..." />
-</Form.Item>
-```
+### 4.3 代码风格
 
-## 7. 权限控制组件
+- 优先 **纯函数** 与 **小模块**，便于单测。  
+- 与模型、向量库交互的 **密钥与 endpoint** 由调用方（API）注入，Agent 内不写死生产环境配置。  
+- 对外导出命名清晰，避免从 `index.ts` 导出过多同名符号导致冲突。
 
-保留实习规范中的优秀设计，采用声明式鉴权组件。
+---
 
-```typescript
-import { useUserStore } from '@/store/useUserStore';
-import type { FC, ReactNode } from 'react';
+## 5. ESLint 与 Prettier（根目录）
 
-interface AccessProps {
-  requiredRole: 'ADMIN' | 'MEMBER';
-  children: ReactNode;
-}
+- **`apps/web/**/*.{ts,tsx}`**：浏览器全局 + React Hooks + React Refresh。  
+- **`apps/api/**/*.ts`**、**`packages/agent/**/*.ts`**：Node 全局，无 React Refresh。  
+- 全仓启用 **Prettier 推荐集成**；与 ESLint 冲突规则由 `eslint-config-prettier` 处理。
 
-export const Access: FC<AccessProps> = ({ requiredRole, children }) => {
-  const userInfo = useUserStore((state) => state.userInfo);
-  const hasAccess = userInfo?.role === requiredRole || userInfo?.role === 'ADMIN';
+若某条规则在特殊场景下必须关闭，须在 PR 中说明理由，并尽量 **局部 disable**，禁止无注释大面积关闭。
 
-  return hasAccess ? <>{children}</> : null;
-};
+---
 
-// 使用
-<Access requiredRole="ADMIN">
-  <Button type="primary">修改团队规范</Button>
-</Access>
-```
+## 6. 文档与演进
 
-## 8. 样式规范
+- 仓库入口说明见 [README.md](README.md)。  
+- 本文件随架构与栈迭代 **持续更新**；新增全仓级约定时，请同步修改本节或对应章节并知会全员。
 
-采用 **CSS Modules**（`.module.css` 或 `.module.less`）防止样式污染。
+---
 
-类名推荐使用中划线或下划线连接，禁止直接给基础 HTML 标签（如 `div`、`span`）写全局样式。
-
-```css
-/* workspace.module.css */
-.workspace-container {
-  display: flex;
-  height: 100vh;
-}
-.sidebar_panel {
-  width: 280px;
-  background: var(--bg-panel);
-}
-```
-
-```typescript
-import styles from './workspace.module.css';
-
-<div className={styles['workspace-container']}>...</div>
-```
+**一致的风格是团队速度的放大器。请从下一个 PR 开始，把本规范当作默认肌肉记忆。** ✨
