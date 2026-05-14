@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { OwnerType, Visibility } from '../org/constants';
+import { OwnerType, Visibility } from '@/common/enums';
 
 export type AssetDocument = Asset & Document;
 

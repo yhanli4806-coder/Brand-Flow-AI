@@ -1,11 +1,18 @@
 import 'reflect-metadata'
 import { NestFactory } from '@nestjs/core'
+import { ValidationPipe } from '@nestjs/common'
 import { AppModule } from './app.module'
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter'
 import { TransformInterceptor } from './common/interceptors/transform.interceptor'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
+
+  // 全局校验管道
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true,
+    transform: true,
+  }))
 
   // 全局拦截器：包装成功响应
   app.useGlobalInterceptors(new TransformInterceptor())
