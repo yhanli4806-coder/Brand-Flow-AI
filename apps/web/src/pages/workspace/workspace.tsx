@@ -1,4 +1,5 @@
 ﻿import { useEffect, useRef, useState } from 'react'
+import { ReactFlowProvider } from 'reactflow'
 import { DownOutlined, LockFilled } from '@ant-design/icons'
 import { useLocation } from 'react-router-dom'
 import { SelectionTabs } from '../../components/SelectionTabs'
@@ -12,11 +13,13 @@ import {
   WORKSPACE_SIDE_TABS,
   WORKSPACE_VIEW_TABS,
 } from './workspace.const'
+import FlowView from './components/FlowView'
 import styles from './workspace.module.css'
 
 const Workspace = () => {
   const location = useLocation()
 
+  const [viewTabIndex, setViewTabIndex] = useState(0)
   const [selectedGroupKey, setSelectedGroupKey] = useState(WORKSPACE_GROUP_OPTIONS[0].key)
   const [isGroupMenuOpen, setIsGroupMenuOpen] = useState(true)
   const [leftTabIndex, setLeftTabIndex] = useState(0)
@@ -71,7 +74,7 @@ const Workspace = () => {
     <div className={styles.wrapper}>
       <div className={styles.topBar}>
         <span className={styles.topBarTitle}>瑞幸夏日海报_v1</span>
-        <SwitchTabs items={WORKSPACE_VIEW_TABS} />
+        <SwitchTabs items={WORKSPACE_VIEW_TABS} defaultIndex={viewTabIndex} onChange={(i) => setViewTabIndex(i)} />
         <div className={styles.statusIndicator}>
           <div className={styles.spinner} />
           <span>运行中</span>
@@ -178,7 +181,17 @@ const Workspace = () => {
         </aside>
 
         <section className={styles.center}>
-          <div className={styles.canvasArea}>中间画布内容区域</div>
+          {viewTabIndex === 0 ? (
+            <div className={styles.canvasArea}>
+              <ReactFlowProvider>
+                <FlowView />
+              </ReactFlowProvider>
+            </div>
+          ) : (
+            <div className={styles.previewArea}>
+              <div className={styles.previewPlaceholder}>画板预览</div>
+            </div>
+          )}
         </section>
 
         <aside className={styles.right}>

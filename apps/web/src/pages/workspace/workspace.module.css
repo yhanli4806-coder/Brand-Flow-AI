@@ -401,14 +401,24 @@
 .canvasArea {
   width: 100%;
   height: 100%;
-  background-image: radial-gradient(#d7dadc 1px, transparent 1px);
-  background-size: 24px 24px;
   position: relative;
   overflow: hidden;
+  background: #f5f6f8;
+}
+
+/* ===== 画板预览区域（精修） ===== */
+.previewArea {
+  width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
+  background: #f5f6f8;
+}
+
+.previewPlaceholder {
   color: var(--text-secondary);
+  font-size: 14px;
 }
 
 /* =====================================
@@ -454,7 +464,7 @@
   min-height: 28px;
   padding: 0 10px;
   border-radius: 16px;
-  background: #eef3ff;
+  background: var(--bg-body);
   color: #4f6ff7;
   font-size: 12px;
   font-weight: 600;

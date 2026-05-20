@@ -1,4 +1,4 @@
-export const WORKSPACE_VIEW_TABS = ['节点流视图', '画板预览（精修）']
+export const WORKSPACE_VIEW_TABS = ['节点流视图', '画板']
 
 export const WORKSPACE_SIDE_TABS = ['知识资产', '历史记录']
 
@@ -59,3 +59,76 @@ export const SLIDER_CONFIG = {
   unit: '%',
   rangeLabels: ['宽泛', '精准'],
 }
+
+/** 节点流节点定义 */
+export type FlowNodeId = 'intent' | 'brand-kb' | 'prompt' | 'image-gen' | 'compose' | 'eval'
+
+export type NodeExecStatus = 'done' | 'running' | 'pending'
+export type LayoutDir = 'vertical' | 'horizontal'
+
+export interface FlowNodeDefinition {
+  id: FlowNodeId
+  type: 'input' | 'process' | 'output'
+  step: string
+  title: string
+  emoji: string
+  subtitle: string
+  execStatus: NodeExecStatus
+}
+
+export const FLOW_NODES: FlowNodeDefinition[] = [
+  {
+    id: 'intent',
+    type: 'input',
+    step: '1',
+    title: '意图解析',
+    emoji: '🧩',
+    subtitle: '主题/风格',
+    execStatus: 'done',
+  },
+  {
+    id: 'brand-kb',
+    type: 'process',
+    step: '2',
+    title: '知识匹配',
+    emoji: '📦',
+    subtitle: '品牌资产',
+    execStatus: 'running',
+  },
+  {
+    id: 'prompt',
+    type: 'process',
+    step: '3',
+    title: 'Prompt专家',
+    emoji: '✍️',
+    subtitle: '绘图指令',
+    execStatus: 'pending',
+  },
+  {
+    id: 'image-gen',
+    type: 'process',
+    step: '4',
+    title: '图像生成',
+    emoji: '🎨',
+    subtitle: '生成底图',
+    execStatus: 'pending',
+  },
+  {
+    id: 'compose',
+    type: 'process',
+    step: '5',
+    title: '排版合成',
+    emoji: '📐',
+    subtitle: '文字/LOGO',
+    execStatus: 'pending',
+  },
+  {
+    id: 'eval',
+    type: 'output',
+    step: '6',
+    title: '自我评估',
+    emoji: '✅',
+    subtitle: '质检评分',
+    execStatus: 'pending',
+  },
+]
