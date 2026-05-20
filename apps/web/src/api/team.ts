@@ -47,7 +47,7 @@ const mockSpaces: SpaceData[] = [
 
 const mockMembers: TeamMemberData[] = [
   { id: 'u_001', name: '张主管', role: '管理员', roleType: 'admin' },
-  { id: 'u_002', name: '王一恒 (我)', role: '普通成员', roleType: 'member', isSelf: true },
+  { id: 'u_002', name: '王一恒', role: '普通成员', roleType: 'member', isSelf: true },
 ]
 
 // ============================================================

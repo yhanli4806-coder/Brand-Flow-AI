@@ -145,7 +145,7 @@ const Profile = () => {
                     </div>
                     <span className={styles.memberName}>
                       {member.name}
-                      {member.isSelf && <Tag className={styles.selfTag}>我</Tag>}
+                      {member.isSelf && <span className={styles.selfTag}>（我）</span>}
                     </span>
                     <Tag
                       color={member.roleType === 'admin' ? 'gold' : 'default'}
