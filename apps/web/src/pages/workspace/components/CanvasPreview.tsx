@@ -10,7 +10,11 @@ const TOOLS: { key: Tool; icon: string; label: string }[] = [
   { key: 'undo', icon: '↩️', label: '回退' },
 ]
 
-const CanvasPreview = () => {
+interface CanvasPreviewProps {
+  onSaveKnowledge?: () => void
+}
+
+const CanvasPreview = ({ onSaveKnowledge }: CanvasPreviewProps) => {
   const [activeTool, setActiveTool] = useState<Tool>('hand')
 
   return (
@@ -31,7 +35,11 @@ const CanvasPreview = () => {
             </button>
           ))}
         </div>
-        <button type="button" className={styles.saveKnowledgeBtn}>
+        <button
+          type="button"
+          className={styles.saveKnowledgeBtn}
+          onClick={onSaveKnowledge}
+        >
           存入个人知识库
         </button>
       </div>

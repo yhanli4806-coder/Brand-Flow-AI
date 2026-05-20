@@ -15,6 +15,7 @@ import {
 } from './workspace.const'
 import FlowView from './components/FlowView'
 import CanvasPreview from './components/CanvasPreview'
+import SaveKnowledgeModal from './components/SaveKnowledgeModal'
 import styles from './workspace.module.css'
 
 const Workspace = () => {
@@ -29,6 +30,7 @@ const Workspace = () => {
   const [editingTagValue, setEditingTagValue] = useState('')
   const tagInputRef = useRef<HTMLInputElement>(null)
   const [sliderValue, setSliderValue] = useState(SLIDER_CONFIG.defaultValue)
+  const [isSaveModalVisible, setIsSaveModalVisible] = useState(false)
   const closeMenuTimerRef = useRef<number | null>(null)
   const groupSelectWrapRef = useRef<HTMLDivElement | null>(null)
 
@@ -189,7 +191,7 @@ const Workspace = () => {
               </ReactFlowProvider>
             </div>
           ) : (
-            <CanvasPreview />
+            <CanvasPreview onSaveKnowledge={() => setIsSaveModalVisible(true)} />
           )}
         </section>
 
@@ -290,6 +292,18 @@ const Workspace = () => {
           </div>
         </aside>
       </div>
+
+      <SaveKnowledgeModal
+        visible={isSaveModalVisible}
+        tags={tags}
+        onTagsChange={setTags}
+        groupOptions={WORKSPACE_GROUP_OPTIONS}
+        selectedGroupKey={selectedGroupKey}
+        onClose={() => setIsSaveModalVisible(false)}
+        onSave={(data) => {
+          console.log('保存到知识库：', data)
+        }}
+      />
     </div>
   )
 }
