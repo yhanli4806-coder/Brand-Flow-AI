@@ -1,6 +1,13 @@
+/* ============================================================
+   登录 / 注册页面卡片样式（login.module.css）
+   被 login.tsx 和 register.tsx 共用，采用居中卡片布局
+   ============================================================ */
+
+/* ---- 登录卡片容器 ---- */
+/* 白色圆角卡片，带轻微阴影和边框，在 AuthLayout 中水平垂直居中 */
 .card {
   width: 100%;
-  max-width: 525px;
+  max-width: 525px;              /* 最大宽度，大屏上保持适中 */
   background: var(--bg-panel);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
@@ -9,24 +16,27 @@
   text-align: center;
 }
 
+/* ---- Logo 区域 ---- */
 .logoWrap {
   display: flex;
-  justify-content: center;
+  justify-content: center;       /* Logo 图标居中 */
   margin-bottom: 24px;
 }
 
+/* Logo 圆角方块，带蓝色渐变背景和阴影 */
 .logoMark {
   width: 60px;
   height: 60px;
-  border-radius: 18px;
+  border-radius: 18px;           /* 圆角方块，区别于正圆 */
   background: linear-gradient(135deg, #90c2ff 0%, #2f6cf6 100%);
   box-shadow: 0 10px 20px rgba(47, 108, 246, 0.18);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 30px;
+  font-size: 30px;               /* 字母 B 的大小 */
 }
 
+/* ---- 标题区 ---- */
 .title {
   margin: 0 0 8px;
   font-size: 38px;
@@ -41,14 +51,17 @@
   color: var(--text-secondary);
 }
 
+/* ---- 表单通用 ---- */
 .form {
-  text-align: left;
+  text-align: left;              /* 表单内容左对齐 */
 }
 
+/* 单个表单项的外层（覆盖 Ant Design 默认样式用） */
 .formItem {
   margin-bottom: 20px;
 }
 
+/* 输入框统一样式 */
 .input {
   height: 56px;
   border-radius: var(--radius-md);
@@ -59,10 +72,25 @@
   font-size: 16px;
 }
 
+/* ---- 提交按钮 ---- */
 .submitButton {
   height: 56px;
   border-radius: var(--radius-md);
   font-weight: 700;
   font-size: 20px;
   background: var(--primary);
+}
+
+/* ---- 底部切换行 ---- */
+/* "还没有账号？注册账号" 或 "已有账号？去登录" */
+.switchRow {
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* 切换路由的链接文字 */
+.switchLink {
+  margin-left: 4px;
+  color: var(--primary);
 }
