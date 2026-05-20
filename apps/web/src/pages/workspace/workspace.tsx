@@ -4,6 +4,8 @@ import { useLocation } from 'react-router-dom'
 import { SelectionTabs } from '../../components/SelectionTabs'
 import { SwitchTabs } from '../../components/SwitchTabs'
 import {
+  DEFAULT_TAGS,
+  SLIDER_CONFIG,
   WORKSPACE_ASSET_ITEMS,
   WORKSPACE_GROUP_OPTIONS,
   WORKSPACE_HISTORY_RECORDS,
@@ -18,6 +20,11 @@ const Workspace = () => {
   const [selectedGroupKey, setSelectedGroupKey] = useState(WORKSPACE_GROUP_OPTIONS[0].key)
   const [isGroupMenuOpen, setIsGroupMenuOpen] = useState(true)
   const [leftTabIndex, setLeftTabIndex] = useState(0)
+  const [tags, setTags] = useState<string[]>([...DEFAULT_TAGS])
+  const [isTagInputVisible, setIsTagInputVisible] = useState(false)
+  const [editingTagValue, setEditingTagValue] = useState('')
+  const tagInputRef = useRef<HTMLInputElement>(null)
+  const [sliderValue, setSliderValue] = useState(SLIDER_CONFIG.defaultValue)
   const closeMenuTimerRef = useRef<number | null>(null)
   const groupSelectWrapRef = useRef<HTMLDivElement | null>(null)
 
@@ -176,9 +183,99 @@ const Workspace = () => {
 
         <aside className={styles.right}>
           <div className={styles.rightHeader}>
-            <span className={styles.panelTitle}>节点属性</span>
+            <span className={styles.panelTitle}>节点属性：知识库匹配</span>
           </div>
-          <div className={styles.rightContent}>右侧内容区域</div>
+          <div className={styles.rightContent}>
+            {/* ===== 标签区域 ===== */}
+            <div className={styles.rightTagSection}>
+              <h3 className={styles.rightSectionTitle}>基于意图自动命中的标签</h3>
+              <div className={styles.tagList}>
+                {tags.map((tag) => (
+                  <span key={tag} className={styles.tagChip}>
+                    <span className={styles.tagChipText}>{tag}</span>
+                    <button
+                      type="button"
+                      className={styles.tagChipRemove}
+                      onClick={() => {
+                        setTags((prev) => prev.filter((t) => t !== tag))
+                      }}
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+                {isTagInputVisible ? (
+                  <input
+                    ref={tagInputRef}
+                    className={styles.tagInputInline}
+                    type="text"
+                    placeholder="输入标签"
+                    value={editingTagValue}
+                    onChange={(e) => setEditingTagValue(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        const trimmed = editingTagValue.trim()
+                        if (trimmed && !tags.includes(trimmed)) {
+                          setTags((prev) => [...prev, trimmed])
+                        }
+                        setEditingTagValue('')
+                        setIsTagInputVisible(false)
+                      }
+                      if (e.key === 'Escape') {
+                        setEditingTagValue('')
+                        setIsTagInputVisible(false)
+                      }
+                    }}
+                    onBlur={() => {
+                      setEditingTagValue('')
+                      setIsTagInputVisible(false)
+                    }}
+                    autoFocus
+                  />
+                ) : (
+                  <button
+                    type="button"
+                    className={styles.tagAddDashed}
+                    onClick={() => {
+                      setIsTagInputVisible(true)
+                      setEditingTagValue('')
+                    }}
+                  >
+                    + 添加标签
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* ===== 滑杆调节区 ===== */}
+            <div className={styles.rightSliderSection}>
+              <div className={styles.propSectionRow}>
+                <span className={styles.sliderSectionLabel}>{SLIDER_CONFIG.label}</span>
+                <span className={styles.sliderValue}>
+                  {sliderValue}{SLIDER_CONFIG.unit}
+                </span>
+              </div>
+              <input
+                type="range"
+                className={styles.slider}
+                min={SLIDER_CONFIG.min}
+                max={SLIDER_CONFIG.max}
+                value={sliderValue}
+                onChange={(e) => setSliderValue(Number(e.target.value))}
+              />
+              <div className={styles.sliderRangeLabels}>
+                <span>{SLIDER_CONFIG.rangeLabels[0]}</span>
+                <span>{SLIDER_CONFIG.rangeLabels[1]}</span>
+              </div>
+            </div>
+
+            {/* ===== 底部操作按钮 ===== */}
+            <div className={styles.rightFooter}>
+              <button type="button" className={styles.interceptBtn}>
+                拦截并人工修改后续指令
+              </button>
+            </div>
+          </div>
         </aside>
       </div>
     </div>

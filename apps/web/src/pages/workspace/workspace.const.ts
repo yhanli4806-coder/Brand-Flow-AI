@@ -21,14 +21,14 @@ export const WORKSPACE_HISTORY_RECORDS = [
     tag: '节点流视图',
     time: '10 分钟前',
     title: '项目组知识库检索',
-    description: '查看“品牌规范 / 颜色 / Logo”相关引用链路',
+    description: '查看"品牌规范 / 颜色 / Logo"相关引用链路',
   },
   {
     id: 'history-switch',
     tag: '成员操作',
     time: '今天 09:12',
     title: '个人知识库切换记录',
-    description: '从“瑞幸项目组”切换到“个人知识库”并查看最近内容',
+    description: '从"瑞幸项目组"切换到"个人知识库"并查看最近内容',
   },
 ]
 
@@ -46,3 +46,16 @@ export const WORKSPACE_ASSET_ITEMS = [
     badge: 'Luckin',
   },
 ]
+
+/** 右侧属性面板 —— 默认标签 */
+export const DEFAULT_TAGS = ['品牌蓝', '标准Logo', '瑞幸元素']
+
+/** 右侧属性面板 —— 滑杆默认值 */
+export const SLIDER_CONFIG = {
+  min: 0,
+  max: 100,
+  defaultValue: 70,
+  label: '匹配逻辑阈值',
+  unit: '%',
+  rangeLabels: ['宽泛', '精准'],
+}
