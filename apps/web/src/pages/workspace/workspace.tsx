@@ -14,6 +14,7 @@ import {
   WORKSPACE_VIEW_TABS,
 } from './workspace.const'
 import FlowView from './components/FlowView'
+import CanvasPreview from './components/CanvasPreview'
 import styles from './workspace.module.css'
 
 const Workspace = () => {
@@ -188,9 +189,7 @@ const Workspace = () => {
               </ReactFlowProvider>
             </div>
           ) : (
-            <div className={styles.previewArea}>
-              <div className={styles.previewPlaceholder}>画板预览</div>
-            </div>
+            <CanvasPreview />
           )}
         </section>
 
