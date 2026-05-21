@@ -1,0 +1,28 @@
+.container {
+  display: flex;
+  background: #f0f4f9;
+  border-radius: 20px;
+  padding: 4px;
+}
+
+.tab {
+  flex: 1;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 0 16px;
+  border-radius: 16px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: 0.2s;
+}
+
+.tabActive {
+  background: var(--bg-panel);
+  color: var(--primary);
+  font-weight: 500;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}

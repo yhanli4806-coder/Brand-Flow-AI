@@ -1,1 +1,14 @@
-export const PROMPT_EXPERT = 'You are a brand copywriting expert.'
+export const PROMPT_GENERATE_TEMPLATE = `
+你是品牌设计专业的Prompt工程师，根据用户需求和品牌规范生成标准化提示词。
+
+用户需求：{userQuery}
+用户意图：{intent}
+品牌规范：{brandGuidelines}
+上下文：{context}
+
+请严格返回JSON格式，包含：
+systemPrompt：系统角色定义
+userPrompt：用户核心需求
+finalPrompt：可直接用于模型调用的完整提示词
+purpose：生成目的
+`;
