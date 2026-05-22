@@ -82,7 +82,9 @@ pnpm install
 
 ### 启动全局开发环境（Turbo）
 
-在根目录一键拉起各包已声明的 `dev` 任务（例如 Web 的 Vite + API 的 Nest watch）：
+API 依赖本地 MongoDB 与 Redis。仓库已提供 `apps/api/docker-compose.yml`，因此需要先确保 Docker Desktop 正在运行。
+
+在根目录一键拉起本地依赖与各包已声明的 `dev` 任务（例如 Web 的 Vite + API 的 Nest watch）：
 
 ```bash
 pnpm dev
@@ -91,7 +93,15 @@ pnpm dev
 等价于：
 
 ```bash
-pnpm exec turbo run dev
+pnpm dev:deps
+pnpm dev:code
+```
+
+如果只想启动或停止基础设施：
+
+```bash
+pnpm dev:deps
+pnpm dev:deps:down
 ```
 
 **只想跑某一个包？** 用 filter，互不打扰：

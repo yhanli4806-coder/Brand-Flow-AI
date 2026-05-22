@@ -4,7 +4,10 @@
   "type": "module",
   "packageManager": "pnpm@10.29.3",
   "scripts": {
-    "dev": "turbo run dev",
+    "dev": "pnpm dev:deps && turbo run dev",
+    "dev:code": "turbo run dev",
+    "dev:deps": "node scripts/dev-deps.mjs",
+    "dev:deps:down": "node scripts/dev-deps.mjs down",
     "build": "turbo run build",
     "lint": "turbo run lint"
   },
