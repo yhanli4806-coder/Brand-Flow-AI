@@ -7,12 +7,14 @@ import { AppService } from './app.service';
 import { OrgModule } from './modules/org/org.module';
 import { AssetsModule } from './modules/assets/assets.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { WorkflowModule } from './modules/workflow/workflow.module';
 
 @Module({
   imports: [
     OrgModule,
     AssetsModule,
     AuthModule,
+    WorkflowModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
