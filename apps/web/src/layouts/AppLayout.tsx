@@ -30,41 +30,39 @@ const AppLayout = () => {
   }
 
   return (
-    <div className={styles.page}>
-      <div className={styles.window}>
-        <aside className={styles.sidebar}>
-          <div className={styles.navTop}>
-            {navItems.map((item) => {
-              const isActive = item.key === activeKey
+    <div className={styles.window}>
+      <aside className={styles.sidebar}>
+        <div className={styles.navTop}>
+          {navItems.map((item) => {
+            const isActive = item.key === activeKey
 
-              return (
-                <button
-                  key={item.key}
-                  type="button"
-                  onClick={() => handleNavClick(item)}
-                  title={item.label}
-                  className={`${styles.iconButton} ${isActive ? styles.iconButtonActive : ''}`}
-                >
-                  {item.text}
-                </button>
-              )
-            })}
-          </div>
+            return (
+              <button
+                key={item.key}
+                type="button"
+                onClick={() => handleNavClick(item)}
+                title={item.label}
+                className={`${styles.iconButton} ${isActive ? styles.iconButtonActive : ''}`}
+              >
+                {item.text}
+              </button>
+            )
+          })}
+        </div>
 
-          <button
-            type="button"
-            onClick={handleProfileClick}
-            className={`${styles.iconButton} ${styles.avatarButton} ${activeKey === 'profile' ? styles.avatarButtonActive : ''}`}
-            title="个人中心"
-          >
-            个
-          </button>
-        </aside>
+        <button
+          type="button"
+          onClick={handleProfileClick}
+          className={`${styles.iconButton} ${styles.avatarButton} ${activeKey === 'profile' ? styles.avatarButtonActive : ''}`}
+          title="个人中心"
+        >
+          个
+        </button>
+      </aside>
 
-        <main className={styles.mainContent}>
-          <Outlet context={{ activeKey }} />
-        </main>
-      </div>
+      <main className={styles.mainContent}>
+        <Outlet context={{ activeKey }} />
+      </main>
     </div>
   )
 }
