@@ -3,6 +3,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './schemas/user.schema';
 import { Team, TeamSchema } from './schemas/team.schema';
 import { Enterprise, EnterpriseSchema } from './schemas/enterprise.schema';
+import { OrgService } from './org.service';
+import { OrgController } from './org.controller';
 
 @Module({
   imports: [
@@ -12,6 +14,8 @@ import { Enterprise, EnterpriseSchema } from './schemas/enterprise.schema';
       { name: Enterprise.name, schema: EnterpriseSchema },
     ]),
   ],
-  exports: [MongooseModule],
+  controllers: [OrgController],
+  providers: [OrgService],
+  exports: [MongooseModule, OrgService],
 })
 export class OrgModule {}
