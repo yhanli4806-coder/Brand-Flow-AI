@@ -3,18 +3,10 @@
  *
  * 架构说明：
  * - 提供统一的 axios 实例，配置 baseURL、超时、请求/响应拦截器
- * - USE_MOCK 开关控制是否使用 mock 数据（开发阶段 = true）
- * - 切换为 false 即可对接真实后端 API，无需改动页面代码
+ * - 不再使用 mock 模式，直接对接真实后端 API
  */
 
 import axios from 'axios'
-
-// ============================================================
-// Mock 模式开关
-// - true  = 所有 API 走 mock 数据（当前开发阶段）
-// - false = 走真实后端 HTTP 请求（对接 apps/api NestJS）
-// ============================================================
-export const USE_MOCK = true
 
 // ============================================================
 // Axios 实例
@@ -42,19 +34,27 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response.data,
   (error) => {
+    // 从后端错误响应体中提取 message
+    const backendData = error.response?.data
+    const message =
+      backendData?.message ||
+      error.message ||
+      '网络异常，请稍后重试'
+
     if (error.response?.status === 401) {
       // token 过期，跳转到登录页
       window.location.href = '/login'
     }
-    return Promise.reject(error)
+
+    return Promise.reject(new Error(message))
   },
 )
-
-export default apiClient
 
 // ============================================================
 // Mock 工具函数
 // ============================================================
+// 注意：当前 knowledge.ts / workflow.ts / team.ts 仍在使用这些工具，
+// 未来全部对接真实后端后可移除。
 
 /**
  * 模拟网络延迟
@@ -82,8 +82,7 @@ export async function callApi<T>(
   mockFn: () => Promise<T>,
   requestFn: () => Promise<T>,
 ): Promise<T> {
-  if (USE_MOCK) {
-    return mockFn()
-  }
   return requestFn()
 }
+
+export default apiClient
