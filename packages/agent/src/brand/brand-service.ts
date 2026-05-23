@@ -1,6 +1,6 @@
 import { BrandGuidelines, BrandContext } from "./brand-types";
 
-// 默认品牌规范（可对接后端数据库）
+// 默认品牌规范（当未传入品牌数据时使用）
 const DEFAULT_BRAND: BrandGuidelines = {
   brandName: "默认品牌",
   brandStyle: ["简约", "现代", "专业"],
@@ -9,17 +9,22 @@ const DEFAULT_BRAND: BrandGuidelines = {
   forbiddenContent: ["低俗", "暴力", "违规元素"],
 };
 
-// 品牌服务：获取/格式化品牌规范
 export class BrandService {
-  // 获取品牌规范
-  getBrandGuidelines(brandName?: string): BrandGuidelines {
-    // 生产环境可替换为接口请求
-    return DEFAULT_BRAND;
+  private currentBrand: BrandGuidelines | null = null;
+
+  // 设置品牌规范（由外部调用，例如从数据库读取后传入）
+  setBrandGuidelines(brand: BrandGuidelines): void {
+    this.currentBrand = brand;
+  }
+
+  // 获取品牌规范（优先使用外部设置，否则返回默认）
+  getBrandGuidelines(): BrandGuidelines {
+    return this.currentBrand || DEFAULT_BRAND;
   }
 
   // 格式化品牌规范为AI可识别的文本
   formatBrandContext(brand?: BrandGuidelines): BrandContext {
-    const target = brand || DEFAULT_BRAND;
+    const target = brand || this.getBrandGuidelines();
     
     const formattedText = `
 品牌名称：${target.brandName}
