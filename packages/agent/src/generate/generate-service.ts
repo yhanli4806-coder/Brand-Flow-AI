@@ -4,13 +4,21 @@ import { ChatOpenAI } from "@langchain/openai";
 
 // 生成服务核心类
 export class GenerateService {
-  private textLlm: ChatOpenAI;
+  // 原直接初始化改为懒加载，避免模块加载时崩溃
+  private _textLlm: ChatOpenAI | null = null;
+
+  private get textLlm(): ChatOpenAI {
+    if (!this._textLlm) {
+      this._textLlm = new ChatOpenAI({
+        modelName: process.env.OPENAI_MODEL_NAME || "gpt-4o",
+        temperature: 0.7,
+      });
+    }
+    return this._textLlm;
+  }
 
   constructor() {
-    this.textLlm = new ChatOpenAI({
-      modelName: process.env.OPENAI_MODEL_NAME || "gpt-4o",
-      temperature: 0.7,
-    });
+    // 原代码：this.textLlm = new ChatOpenAI({...}) 已移至 getter 中懒加载
   }
 
   // 执行生成
