@@ -4,6 +4,8 @@ import { createPromptChain } from "./prompt-chain";
 import type { IntentInput, IntentOutput } from "./intent-chain";
 import type { PromptChainOutput } from "./prompt-chain";
 import { brandService } from "../../brand";
+import type { GenerateResult } from "../../generate/generate-types";
+import { generateService } from "../../generate";
 import { safeJsonParse } from "../../common";
 
 // 工作流最终输出类型
@@ -11,6 +13,7 @@ export interface WorkflowOutput {
   userInput: string;
   intentResult: IntentOutput;
   promptResult: PromptChainOutput;
+  generateResult?: GenerateResult; 
   status: "success" | "failed";
 }
 
@@ -34,11 +37,22 @@ export function createWorkflowChain() {
           brandGuidelines: brandService.formatBrandContext().formattedBrandText,
           context: JSON.stringify(input.context || {}),
         });
+         // 根据意图类型决定生成类型
+        const generateType = intentResult.intent === "图片生成" ? "image"
+                        : intentResult.intent === "品牌描述" ? "text"
+                        : "brand_material";
+
+        const generateResult = await generateService.executeGenerate({
+        promptData: promptResult,
+        generateType,
+        sessionId: input.context?.sessionId,
+    }); 
 
         return {
           userInput: input.userQuery,
           intentResult,
           promptResult,
+          generateResult,
           status: "success",
         };
       } catch (error) {
