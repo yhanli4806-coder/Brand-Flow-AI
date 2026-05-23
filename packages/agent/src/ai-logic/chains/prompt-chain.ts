@@ -22,7 +22,7 @@ export interface PromptChainOutput {
 
 export function createPromptChain() {
   const llm = new ChatOpenAI({
-    modelName: "gpt-4o",
+    modelName: process.env.OPENAI_MODEL_NAME || "deepseek-ai/DeepSeek-V3",
     temperature: 0.2,
   });
 

@@ -4,7 +4,9 @@
   "private": true,
   "main": "./dist/index.js",
   "types": "./src/index.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "dev": "tsc -p tsconfig.build.json --watch",
@@ -17,6 +19,7 @@
     "langchain": "^0.3.29"
   },
   "devDependencies": {
+    "@types/node": "^24.12.4",
     "eslint": "^10.2.1",
     "typescript": "~6.0.2"
   }

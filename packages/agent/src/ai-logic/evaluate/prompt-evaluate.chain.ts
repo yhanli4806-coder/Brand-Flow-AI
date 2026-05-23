@@ -10,7 +10,7 @@ import { safeJsonParse } from "../../common";
 // 创建评估链
 export function createPromptEvaluationChain() {
   const llm = new ChatOpenAI({
-    modelName: "gpt-4o",
+    modelName: process.env.OPENAI_MODEL_NAME || "deepseek-ai/DeepSeek-V3",
     temperature: 0.1,
   });
 

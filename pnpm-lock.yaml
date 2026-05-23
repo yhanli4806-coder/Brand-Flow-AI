@@ -203,6 +203,9 @@ importers:
         specifier: ^0.3.29
         version: 0.3.37(@langchain/core@0.3.80(openai@4.104.0(ws@8.20.0)(zod@3.25.76)))(axios@1.16.0)(openai@4.104.0(ws@8.20.0)(zod@3.25.76))(ws@8.20.0)
     devDependencies:
+      '@types/node':
+        specifier: ^24.12.4
+        version: 24.12.4
       eslint:
         specifier: ^10.2.1
         version: 10.3.0

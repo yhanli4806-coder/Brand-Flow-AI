@@ -8,9 +8,9 @@ export const EVALUATION_PROMPT = `
 
 请按1-5分评分，返回严格JSON格式，包含：
 overallScore: 总体评分
-intentEvaluation: { score, comment } 意图准确性评估
-promptEvaluation: { score, comment } 提示词质量评估
-complianceEvaluation: { score, comment } 品牌合规性评估
+intentEvaluation: {{ score, comment }} 意图准确性评估
+promptEvaluation: {{ score, comment }} 提示词质量评估
+complianceEvaluation: {{ score, comment }} 品牌合规性评估
 suggestions: 改进建议数组
 status: success
 `;

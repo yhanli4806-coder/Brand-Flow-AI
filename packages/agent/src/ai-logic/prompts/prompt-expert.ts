@@ -6,9 +6,11 @@ export const PROMPT_GENERATE_TEMPLATE = `
 品牌规范：{brandGuidelines}
 上下文：{context}
 
-请严格返回JSON格式，包含：
-systemPrompt：系统角色定义
-userPrompt：用户核心需求
-finalPrompt：可直接用于模型调用的完整提示词
-purpose：生成目的
+请严格返回纯JSON格式，无其他内容：
+{{
+  "systemPrompt": "系统角色定义",
+  "userPrompt": "用户核心需求",
+  "finalPrompt": "可直接用于模型调用的完整提示词",
+  "purpose": "生成目的"
+}}
 `;
