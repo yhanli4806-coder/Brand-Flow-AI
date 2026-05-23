@@ -34,18 +34,14 @@ export class GenerateService {
   }
 
   // 模拟生成结果（生产替换为真实AI模型）
-  private mockGenerateResult(
-    type: GenerateType,
-    prompt: string,
-    brandName: string
-  ): string {
-    const map = {
-      image: `【${brandName}】品牌图片生成完成，使用提示词：${prompt.slice(0, 50)}...`,
-      text: `【${brandName}】品牌文案生成完成，符合品牌风格规范`,
-      brand_material: `【${brandName}】品牌物料全套生成完成`,
-    };
-    return map[type];
-  }
+  private mockGenerateResult(type: GenerateType, prompt: string, brandName: string): string {
+  return JSON.stringify({
+    type,
+    brandName,
+    content: `模拟${type === 'image' ? '图片' : type === 'text' ? '文案' : '物料'}生成结果`,
+    promptUsed: prompt.slice(0, 100),
+  });
+}
 }
 
 // 单例导出
