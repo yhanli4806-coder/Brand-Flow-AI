@@ -90,7 +90,17 @@ API 依赖本地 MongoDB 与 Redis。仓库已提供 `apps/api/docker-compose.ym
 pnpm dev
 ```
 
-等价于：
+**推荐：完整一键启动**（Docker → 检查 `.env` → 构建 Agent → Web + API + Agent）：
+
+```bash
+pnpm dev:all
+# 或
+pnpm start
+```
+
+首次运行前请在 `apps/api/.env` 中填写有效的 `OPENAI_API_KEY`（若不存在会从 `.env.example` 自动复制）。若密钥仍是占位符 `sk-xxxxxxx`，启动会中止；仅调试 UI 时可执行 `pnpm dev:all -- --skip-key-check`。
+
+等价于分步执行：
 
 ```bash
 pnpm dev:deps
