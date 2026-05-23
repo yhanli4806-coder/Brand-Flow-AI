@@ -4,8 +4,8 @@
  * 功能说明：
  * - 姓名 + 邮箱 + 密码 + 确认密码
  * - 表单校验（邮箱格式、密码强度、两次密码一致）
- * - 调用 register API（当前 mock 模式）
- * - 注册成功自动登录并跳转 /home
+ * - 调用 register API
+ * - 注册成功跳转到登录页让用户手动登录
  * - 底部提供"已有账号？去登录"链接
  */
 
@@ -14,7 +14,6 @@ import { Button, Form, Input, message } from 'antd'
 import { useNavigate, Link } from 'react-router-dom'
 import { UserOutlined, MailOutlined, LockOutlined } from '@ant-design/icons'
 import { register } from '@/api/auth'
-import { useAuthStore } from '@/store/useAuthStore'
 import styles from './login.module.css'
 
 /** 注册表单字段类型 */
@@ -27,24 +26,20 @@ interface RegisterFormValues {
 
 const RegisterPage = () => {
   const navigate = useNavigate()
-  const setAuth = useAuthStore((state) => state.setAuth)
   const [submitting, setSubmitting] = useState(false)
 
-  /** 表单提交：调用 register API，成功则自动登录并跳转首页 */
+  /** 表单提交：调用 register API，成功则跳转到登录页 */
   const handleFinish = async (values: RegisterFormValues) => {
     setSubmitting(true)
     try {
-      const res = await register({
+      await register({
         name: values.name,
         email: values.email,
         password: values.password,
         confirmPassword: values.confirmPassword,
       })
-      if (res.success) {
-        setAuth(res.data)
-        message.success('注册成功')
-        navigate('/home')
-      }
+      message.success('注册成功，请登录')
+      navigate('/login')
     } catch (err: unknown) {
       /* 捕获 API 抛出的错误（如邮箱已被注册），展示友好提示 */
       const msg = err instanceof Error ? err.message : '注册失败，请稍后重试'

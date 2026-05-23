@@ -6,7 +6,7 @@
  * - register: 新用户注册
  */
 
-import apiClient, { callApi, mockDelay, mockResponse } from './index'
+import apiClient from './index'
 
 // ============================================================
 // 类型定义
@@ -36,41 +36,63 @@ export interface AuthResult {
 }
 
 // ============================================================
-// Mock 实现
+// 后端响应结构（仅用于适配转换）
 // ============================================================
 
-/** 预设的 mock 账号表，key = 邮箱，value = 密码 + 姓名 */
-const mockAccounts: Record<string, { password: string; name: string }> = {
-  'wang@hdu.edu.cn': { password: '123456', name: '王一恒' },
+interface BackendLoginData {
+  access_token: string
+  user: {
+    id: string
+    email: string
+    profile: {
+      nickname?: string
+      avatar?: string
+    }
+    currentEnterpriseId?: string
+  }
 }
 
-/** mock 登录逻辑：校验账号是否存在、密码是否正确 */
-async function mockLogin(params: LoginParams) {
-  await mockDelay(800)
-  const account = mockAccounts[params.email]
-  if (!account) {
-    throw new Error('账号不存在')
+/** 将后端登录数据转换为前端 AuthResult 格式 */
+function toAuthResult(backend: BackendLoginData): AuthResult {
+  return {
+    token: backend.access_token,
+    user: {
+      name: backend.user.profile?.nickname || backend.user.email.split('@')[0],
+      email: backend.user.email,
+    },
   }
-  if (account.password !== params.password) {
-    throw new Error('密码错误')
-  }
-  return mockResponse({
-    token: `mock_token_${Date.now()}`,
-    user: { name: account.name, email: params.email },
-  })
 }
 
-/** mock 注册逻辑：校验邮箱是否已被注册，通过后写入账号表 */
-async function mockRegister(params: RegisterParams) {
-  await mockDelay(800)
-  if (mockAccounts[params.email]) {
-    throw new Error('该邮箱已被注册')
+// ============================================================
+// 真实后端 API 调用
+// ============================================================
+
+/**
+ * 调用后端登录接口
+ *
+ * 注意：
+ * - 后端 TransformInterceptor 将响应包装为 { success, data, message }
+ *   其中 data = { access_token, user }
+ * - axios 响应拦截器已执行 response.data
+ * - 所以 apiClient.post 返回的是 { success, data: { access_token, user }, message }
+ * - 需要取 res.data 获取 BackendLoginData
+ */
+async function realLogin(params: LoginParams) {
+  const res = await apiClient.post<{ success: boolean; data: BackendLoginData }>('/auth/login', params)
+  return {
+    success: true,
+    data: toAuthResult(res.data),
   }
-  mockAccounts[params.email] = { password: params.password, name: params.name }
-  return mockResponse({
-    token: `mock_token_${Date.now()}`,
-    user: { name: params.name, email: params.email },
+}
+
+/** 仅注册，成功后返回成功标识（不自动登录） */
+async function realRegister(params: RegisterParams) {
+  await apiClient.post('/auth/register', {
+    email: params.email,
+    password: params.password,
+    nickname: params.name,
   })
+  return { success: true }
 }
 
 // ============================================================
@@ -79,16 +101,10 @@ async function mockRegister(params: RegisterParams) {
 
 /** 邮箱密码登录 */
 export async function login(params: LoginParams) {
-  return callApi(
-    () => mockLogin(params),
-    () => apiClient.post('/auth/login', params),
-  )
+  return realLogin(params)
 }
 
 /** 新用户注册 */
 export async function register(params: RegisterParams) {
-  return callApi(
-    () => mockRegister(params),
-    () => apiClient.post('/auth/register', params),
-  )
+  return realRegister(params)
 }
