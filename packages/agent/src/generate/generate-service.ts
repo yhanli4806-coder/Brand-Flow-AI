@@ -47,6 +47,7 @@ export class GenerateService {
     }
   }
 
+<<<<<<< HEAD
   // 调用 OpenAI DALL·E 3 文生图 API
   private async callImageGenerationApi(prompt: string): Promise<string> {
     const apiKey = process.env.OPENAI_API_KEY;
@@ -116,6 +117,17 @@ export class GenerateService {
 
     return result.content.toString();
   }
+=======
+  // 模拟生成结果（生产替换为真实AI模型）
+  private mockGenerateResult(type: GenerateType, prompt: string, brandName: string): string {
+  return JSON.stringify({
+    type,
+    brandName,
+    content: `模拟${type === 'image' ? '图片' : type === 'text' ? '文案' : '物料'}生成结果`,
+    promptUsed: prompt.slice(0, 100),
+  });
+}
+>>>>>>> aa1d4bda357c06231c50a3f094a1ef040a0859a3
 }
 
 // 单例导出
