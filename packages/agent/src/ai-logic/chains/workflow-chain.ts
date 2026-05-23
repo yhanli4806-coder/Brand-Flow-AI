@@ -13,11 +13,7 @@ export interface WorkflowOutput {
   userInput: string;
   intentResult: IntentOutput;
   promptResult: PromptChainOutput;
-<<<<<<< HEAD
   generateResult?: GenerateResult; 
-=======
-  generateResult?: GenerateResult;
->>>>>>> aa1d4bda357c06231c50a3f094a1ef040a0859a3
   status: "success" | "failed";
 }
 
@@ -41,7 +37,6 @@ export function createWorkflowChain() {
           brandGuidelines: brandService.formatBrandContext().formattedBrandText,
           context: JSON.stringify(input.context || {}),
         });
-<<<<<<< HEAD
          // 根据意图类型决定生成类型
         const generateType = intentResult.intent === "图片生成" ? "image"
                         : intentResult.intent === "品牌描述" ? "text"
@@ -52,18 +47,6 @@ export function createWorkflowChain() {
         generateType,
         sessionId: input.context?.sessionId,
     }); 
-=======
-        const generateType = intentResult.intent === "image" ? "image"
-                      : intentResult.intent === "text" ? "text"
-                      : "brand_material";
-
-    const generateResult = await generateService.executeGenerate({
-      promptData: promptResult,
-      generateType,
-      sessionId: input.context?.sessionId,
-    });
->>>>>>> aa1d4bda357c06231c50a3f094a1ef040a0859a3
-
         return {
           userInput: input.userQuery,
           intentResult,
