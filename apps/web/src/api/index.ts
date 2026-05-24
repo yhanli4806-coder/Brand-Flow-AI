@@ -7,6 +7,7 @@
  */
 
 import axios from 'axios'
+import { useAuthStore } from '@/store/useAuthStore'
 
 // ============================================================
 // Axios 实例
@@ -22,8 +23,8 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config) => {
     // 后续可以从 useAuthStore 获取 token 并注入
-    // const token = useAuthStore.getState().token
-    // if (token) config.headers.Authorization = `Bearer ${token}`
+    const token = useAuthStore.getState().token
+    if (token) config.headers.Authorization = `Bearer ${token}`
     return config
   },
   (error) => Promise.reject(error),
