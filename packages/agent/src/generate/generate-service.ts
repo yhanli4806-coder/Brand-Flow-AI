@@ -4,17 +4,21 @@ import { ChatOpenAI } from "@langchain/openai";
 
 // 生成服务核心类
 export class GenerateService {
-  private textLlm?: ChatOpenAI;
+  // 原直接初始化改为懒加载，避免模块加载时崩溃
+  private _textLlm: ChatOpenAI | null = null;
 
-  /** 延迟初始化，避免 import 时因未加载 .env 导致 API 启动失败 */
-  private getTextLlm(): ChatOpenAI {
-    if (!this.textLlm) {
-      this.textLlm = new ChatOpenAI({
+  private get textLlm(): ChatOpenAI {
+    if (!this._textLlm) {
+      this._textLlm = new ChatOpenAI({
         modelName: process.env.OPENAI_MODEL_NAME || "gpt-4o",
         temperature: 0.7,
       });
     }
-    return this.textLlm;
+    return this._textLlm;
+  }
+
+  constructor() {
+    // 原代码：this.textLlm = new ChatOpenAI({...}) 已移至 getter 中懒加载
   }
 
   // 执行生成
@@ -94,7 +98,7 @@ export class GenerateService {
       ["human", `请根据以下需求生成品牌文案：\n\n${promptData.finalPrompt}`],
     ]);
 
-    const chain = chatPrompt.pipe(this.getTextLlm());
+    const chain = chatPrompt.pipe(this.textLlm);
     const result = await chain.invoke({});
 
     return result.content.toString();
@@ -115,7 +119,7 @@ export class GenerateService {
       ["human", `生成品牌物料描述：\n\n${promptData.finalPrompt}`],
     ]);
 
-    const chain = chatPrompt.pipe(this.getTextLlm());
+    const chain = chatPrompt.pipe(this.textLlm);
     const result = await chain.invoke({});
 
     return result.content.toString();
