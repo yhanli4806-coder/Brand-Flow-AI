@@ -8,3 +8,4 @@ export * from "./evaluate/evaluate-types";
 export * from "./evaluate/prompt-evaluate.chain";
 export * from "./memory/memory-types";
 export * from "./memory/conversation-memory";
+export * from "./graph";
