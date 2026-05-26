@@ -1,6 +1,7 @@
 import { GenerateRequest, GenerateResult, GenerateType } from "./generate-types";
 import { brandService } from "../brand";
 import { ChatOpenAI } from "@langchain/openai";
+import { ChatPromptTemplate } from "@langchain/core/prompts";
 
 // 生成服务核心类
 export class GenerateService {
@@ -91,7 +92,6 @@ export class GenerateService {
     promptData: { finalPrompt: string; systemPrompt?: string },
     brandName: string
   ): Promise<string> {
-    const { ChatPromptTemplate } = await import("@langchain/core/prompts");
 
     const chatPrompt = ChatPromptTemplate.fromMessages([
       ["system", promptData.systemPrompt || `你是一位专业的品牌文案撰写专家，为品牌"${brandName}"生成高质量的文案内容。`],
@@ -109,7 +109,6 @@ export class GenerateService {
     promptData: { finalPrompt: string; systemPrompt?: string },
     brand: { brandName: string; brandStyle: string[]; mainColors: string[] }
   ): Promise<string> {
-    const { ChatPromptTemplate } = await import("@langchain/core/prompts");
 
     const chatPrompt = ChatPromptTemplate.fromMessages([
       [

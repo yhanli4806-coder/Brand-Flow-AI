@@ -7,7 +7,7 @@ export function safeJsonParse<T = unknown>(
 ): T | null {
   try {
     // 清洗大模型常见的 markdown 标记
-    const cleaned = text.replace(/```json/ig, '').replace(/```/g, '').trim();
+    const cleaned = text.replace(/```(?:json)?/gi, '').trim();
     return JSON.parse(cleaned);
   } catch {
     return defaultValue;
