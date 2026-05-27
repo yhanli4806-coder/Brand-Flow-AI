@@ -2,6 +2,7 @@ import { GenerateRequest, GenerateResult, GenerateType } from "./generate-types"
 import { brandService } from "../brand";
 import { ChatOpenAI } from "@langchain/openai";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
+import { asRunnableLlm } from "../common/langchain-utils";
 
 // 生成服务核心类
 export class GenerateService {
@@ -98,7 +99,7 @@ export class GenerateService {
       ["human", `请根据以下需求生成品牌文案：\n\n${promptData.finalPrompt}`],
     ]);
 
-    const chain = chatPrompt.pipe(this.textLlm);
+    const chain = chatPrompt.pipe(asRunnableLlm(this.textLlm));
     const result = await chain.invoke({});
 
     return result.content.toString();
@@ -118,7 +119,7 @@ export class GenerateService {
       ["human", `生成品牌物料描述：\n\n${promptData.finalPrompt}`],
     ]);
 
-    const chain = chatPrompt.pipe(this.textLlm);
+    const chain = chatPrompt.pipe(asRunnableLlm(this.textLlm));
     const result = await chain.invoke({});
 
     return result.content.toString();
