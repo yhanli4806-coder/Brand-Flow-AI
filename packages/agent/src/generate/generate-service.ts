@@ -52,7 +52,9 @@ export class GenerateService {
         content: "",
         generateType: req.generateType || "image",
         promptUsed: "",
-        message: "生成失败，请重试",
+        message: error instanceof Error 
+  ? error.message 
+  : "生成失败，请重试",
       };
     }
   }
