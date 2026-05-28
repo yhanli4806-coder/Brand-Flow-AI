@@ -10,21 +10,21 @@ export class AssetsController {
 
   @Post()
   async createAsset(@Req() req: any, @Body() createDto: CreateAssetDto) {
-    const userId = req.user.userId;
-    const enterpriseId = req.user.enterpriseId;
+    const userId = req.user.sub;
+    const enterpriseId = req.user.entId;
     return this.assetsService.createAsset(userId, enterpriseId, createDto);
   }
 
   @Get()
   async getAssets(@Req() req: any) {
-    const userId = req.user.userId;
-    const enterpriseId = req.user.enterpriseId;
+    const userId = req.user.sub;
+    const enterpriseId = req.user.entId;
     return this.assetsService.getAssets(userId, enterpriseId);
   }
 
   @Delete(':id')
   async deleteAsset(@Req() req: any, @Param('id') assetId: string) {
-    const userId = req.user.userId;
+    const userId = req.user.sub;
     return this.assetsService.deleteAsset(userId, assetId);
   }
 }

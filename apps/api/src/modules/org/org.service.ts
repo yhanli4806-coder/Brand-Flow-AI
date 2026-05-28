@@ -89,6 +89,15 @@ export class OrgService {
       throw new BadRequestException('请先选择或切换到一家企业再创建团队');
     }
 
+    const user = await this.userModel.findById(userId);
+    const membership = user?.memberships.find(
+      (m) => m.enterpriseId.toString() === enterpriseId && !m.teamId
+    );
+
+    if (!membership || (membership.role !== Role.OWNER && membership.role !== Role.ADMIN)) {
+      throw new BadRequestException('您在该企业中不是管理员，无权创建团队');
+    }
+
     const exists = await this.teamModel.findOne({ enterpriseId, name });
     if (exists) {
       throw new BadRequestException('该企业下已存在同名团队');
@@ -98,6 +107,16 @@ export class OrgService {
       enterpriseId,
       name,
       description,
+    });
+
+    await this.userModel.findByIdAndUpdate(userId, {
+      $push: {
+        memberships: {
+          enterpriseId: enterpriseId,
+          teamId: team._id,
+          role: membership.role,
+        },
+      },
     });
 
     return team;

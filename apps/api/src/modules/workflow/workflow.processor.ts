@@ -8,6 +8,7 @@ import { Workflow, WorkflowDocument } from './schemas/workflow.schema';
 
 interface RunWorkflowJobData {
   workflowId: string;
+  knowledgeId?: string;
 }
 
 @Processor(WORKFLOW_QUEUE)
@@ -36,30 +37,32 @@ export class WorkflowProcessor extends WorkerHost {
         userQuery: workflow.prompt,
         context: {
           spaceId: workflow.spaceId,
+          enterpriseId: workflow.spaceId, // 将空间 ID 充当 enterpriseId 透传
+          knowledgeId: job.data.knowledgeId,
         },
         retryCount: 0,
         status: "running",
       };
 
-      let finalState: AgentStateType | undefined;
+      let finalState: Partial<AgentStateType> = { ...initialState };
 
-      // Stream each step and emit progress
+      // 使用 stream 保留流式进度输出，并通过浅合并来聚合所有的状态
       const stream = await graph.stream(initialState);
       for await (const chunk of stream) {
         await job.updateProgress(chunk);
-        finalState = Object.values(chunk)[0] as AgentStateType; 
-        // Note: graph.stream yields `{ nodeName: stateUpdate }`
+        const update = Object.values(chunk)[0] as Partial<AgentStateType>;
+        finalState = { ...finalState, ...update };
       }
 
       const isSuccess = finalState?.status === 'success' || (finalState?.evaluationResult?.overallScore && finalState.evaluationResult.overallScore >= 4);
 
       await this.workflowModel.findByIdAndUpdate(workflow._id, {
         status: isSuccess ? 'completed' : 'failed',
-        result: finalState,
+        result: finalState as AgentStateType,
         $unset: { errorMessage: 1 },
       });
 
-      return finalState;
+      return finalState as AgentStateType;
     } catch (error) {
       await this.workflowModel.findByIdAndUpdate(workflow._id, {
         status: 'failed',
