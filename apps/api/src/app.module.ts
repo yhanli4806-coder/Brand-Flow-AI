@@ -8,6 +8,7 @@ import { OrgModule } from './modules/org/org.module';
 import { AssetsModule } from './modules/assets/assets.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { WorkflowModule } from './modules/workflow/workflow.module';
+import { KnowledgeModule } from './modules/knowledge/knowledge.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { WorkflowModule } from './modules/workflow/workflow.module';
     AssetsModule,
     AuthModule,
     WorkflowModule,
+    KnowledgeModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',

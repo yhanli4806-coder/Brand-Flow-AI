@@ -4,7 +4,7 @@ import { Model, Types } from 'mongoose';
 import { Asset, AssetDocument } from './asset.schema';
 import { User, UserDocument } from '@/modules/org/schemas/user.schema';
 import { CreateAssetDto } from './dto/assets.dto';
-import { Visibility, OwnerType } from '@/common/enums';
+import { Visibility, OwnerType, Role } from '@/common/enums';
 
 @Injectable()
 export class AssetsService {
@@ -19,6 +19,18 @@ export class AssetsService {
     }
 
     const { name, type, url, ownerId, ownerType, visibility, metadata } = createDto;
+
+    if (visibility === Visibility.TEAM || visibility === Visibility.ENTERPRISE) {
+      const user = await this.userModel.findById(userId);
+      const membership = user?.memberships.find(
+        (m) => m.enterpriseId.toString() === enterpriseId &&
+               (!m.teamId || (ownerType === OwnerType.TEAM && m.teamId.toString() === ownerId))
+      );
+
+      if (!membership || (membership.role !== Role.OWNER && membership.role !== Role.ADMIN)) {
+        throw new BadRequestException('仅部门主管或企业管理员才能往企业/团队库添加规范素材');
+      }
+    }
 
     const asset = await this.assetModel.create({
       name,
@@ -47,7 +59,7 @@ export class AssetsService {
 
     const myTeams = user.memberships
       .filter((m) => m.enterpriseId.toString() === enterpriseId && m.teamId)
-      .map((m) => m.teamId.toString());
+      .map((m) => m.teamId?.toString());
 
     const query = {
       enterpriseId: new Types.ObjectId(enterpriseId),
@@ -75,9 +87,20 @@ export class AssetsService {
       throw new NotFoundException('资产不存在');
     }
 
-    // TODO: 后续可以引入更细粒度的 RBAC 权限判断，允许企业 OWNER/ADMIN 删除成员资产
     if (asset.creatorId.toString() !== userId) {
-      throw new BadRequestException('您无权删除此资产');
+      if (asset.visibility === Visibility.TEAM || asset.visibility === Visibility.ENTERPRISE) {
+        const user = await this.userModel.findById(userId);
+        const membership = user?.memberships.find(
+          (m) => m.enterpriseId.toString() === asset.enterpriseId.toString() &&
+                 (!m.teamId || (asset.ownerType === OwnerType.TEAM && m.teamId.toString() === asset.ownerId.toString()))
+        );
+
+        if (!membership || (membership.role !== Role.OWNER && membership.role !== Role.ADMIN)) {
+          throw new BadRequestException('仅部门主管或企业管理员才能删除公共素材');
+        }
+      } else {
+        throw new BadRequestException('您无权删除此资产');
+      }
     }
 
     await this.assetModel.findByIdAndDelete(assetId);

@@ -14,6 +14,7 @@ import { generateService } from "../generate";
 import { brandService } from "../brand";
 import { conversationMemory } from "./memory/conversation-memory";
 import { logger } from "../common/logger";
+import { searchKnowledge } from "../retrieval";
 
 // ============================================================
 // 1. AgentState（保留 as any，同时导出类型定义）
@@ -99,14 +100,31 @@ export async function knowledgeNode(state: any): Promise<any> {
     return state;
   }
   try {
-    const brandContext = brandService.formatBrandContext();
+    let brandContextText = "";
+    const enterpriseId = state.context?.enterpriseId;
+    const knowledgeId = state.context?.knowledgeId;
+
+    if (enterpriseId && knowledgeId) {
+      logger.info(`[knowledgeNode] 触发向量检索，查询: ${state.userQuery}`);
+      try {
+        const docs = await searchKnowledge(state.userQuery, { enterpriseId, knowledgeId }, 3);
+        brandContextText = docs.map(d => d.pageContent).join("\n\n");
+      } catch (e: any) {
+        logger.warn(`[knowledgeNode] 向量检索异常，降级使用本地配置: ${e.message}`);
+      }
+    }
+
+    if (!brandContextText) {
+      brandContextText = brandService.formatBrandContext().formattedBrandText;
+    }
+
     const sessionId = state.context?.sessionId;
     const history = sessionId
       ? conversationMemory.getFormattedHistory(sessionId)
       : "";
 
     const knowledgeContext = [
-      brandContext.formattedBrandText,
+      brandContextText,
       history ? `对话历史：\n${history}` : "",
     ]
       .filter(Boolean)

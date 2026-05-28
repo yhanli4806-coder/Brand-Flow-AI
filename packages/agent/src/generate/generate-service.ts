@@ -59,26 +59,34 @@ export class GenerateService {
     }
   }
 
-  // 调用 OpenAI DALL·E 3 文生图 API
+  // 调用 硅基流动(SiliconFlow) 文生图 API
   private async callImageGenerationApi(prompt: string): Promise<string> {
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
       throw new Error("OPENAI_API_KEY 未配置");
     }
 
-    const response = await fetch("https://api.openai.com/v1/images/generations", {
+    // 默认回退到硅基流动的官方 Endpoint
+    const baseUrl = (process.env.OPENAI_BASE_URL || "https://api.siliconflow.cn/v1").replace(/\/+$/, "");
+    const url = baseUrl.includes('/v1') ? `${baseUrl}/images/generations` : `${baseUrl}/v1/images/generations`;
+
+    // 组装符合 SiliconFlow 规范的请求体
+    const body: any = {
+      model: process.env.IMAGE_MODEL || "Kwai-Kolors/Kolors",
+      prompt: prompt,
+      image_size: process.env.IMAGE_SIZE || "1024x1024",
+      batch_size: parseInt(process.env.IMAGE_BATCH_SIZE || "1", 10),
+      num_inference_steps: parseInt(process.env.IMAGE_NUM_INFERENCE_STEPS || "20", 10),
+      guidance_scale: parseFloat(process.env.IMAGE_GUIDANCE_SCALE || "7.5"),
+    };
+
+    const response = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
       },
-      body: JSON.stringify({
-        model: process.env.IMAGE_MODEL || "dall-e-3",
-        prompt,
-        n: 1,
-        size: process.env.IMAGE_SIZE || "1024x1024",
-        quality: process.env.IMAGE_QUALITY || "standard",
-      }),
+      body: JSON.stringify(body),
     });
 
     if (!response.ok) {
@@ -87,7 +95,13 @@ export class GenerateService {
     }
 
     const data = await response.json();
-    return data.data?.[0]?.url || "";
+    // 硅基流动通常返回 { images: [{ url: "..." }] } 也有可能兼容 openai 返回 data
+    const imageUrl = data.images?.[0]?.url || data.data?.[0]?.url;
+    
+    if (!imageUrl) {
+      throw new Error("未从 API 响应中找到有效的图片 URL");
+    }
+    return imageUrl;
   }
 
   // 调用 GPT 生成品牌文案
