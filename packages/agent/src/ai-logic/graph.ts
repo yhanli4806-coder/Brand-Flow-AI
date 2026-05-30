@@ -245,7 +245,8 @@ export async function evaluateNode(state: any): Promise<any> {
         status: "failed",
       },
       retryCount: 1,
-      status: "running",
+      status: "failed",      
+      error: `评估失败: ${error.message}`,
     };
   }
 }
@@ -254,6 +255,9 @@ export async function evaluateNode(state: any): Promise<any> {
 // 3. 条件路由
 // ============================================================
 export function routeAfterEvaluation(state: any): "promptNode" | "finishNode" {
+  if (state.status === "failed") {
+    return "finishNode";
+  }
   const retryCount = state.retryCount ?? 0;
   const score = state.evaluationResult?.overallScore ?? 1;
   const THRESHOLD = 6;
@@ -263,6 +267,37 @@ export function routeAfterEvaluation(state: any): "promptNode" | "finishNode" {
   }
 
   return "finishNode";  // ← 先经过 finishNode 设置终态
+}
+
+// 新增节点终态判断
+export async function finishNode(state: any): Promise<any> {
+  if (state.status === "failed") {
+    logger.warn(`[finishNode] 上游节点已标记失败: ${state.error}`);
+    return {};  // 不修改任何字段
+  }
+  const score = state.evaluationResult?.overallScore ?? 1;
+  const threshold = 6;
+  const isSuccess = score >= threshold;
+
+  logger.info(`[finishNode] 最终得分 ${score}，结果: ${isSuccess ? "成功" : "未达标"}`);
+
+  // 存储助手消息 (如果还没存)
+  // 把用户消息也存入记忆
+  if (state.context?.sessionId) {
+    conversationMemory.addMessage({
+      sessionId: state.context.sessionId,
+      message: {
+        role: "user",
+        content: state.userQuery.slice(0, 500),
+        timestamp: Date.now(),
+      },
+    });
+  }
+
+  return {
+    status: isSuccess ? "success" : "failed",
+    error: isSuccess ? undefined : `评估得分 ${score} 未达到阈值 ${threshold}`,
+  };
 }
 
 // ============================================================
@@ -307,30 +342,4 @@ export async function runAgent(params: {
 
   const finalState = await graph.invoke(initialState);
   return finalState as AgentStateType;
-}
-// 新增节点 6：终态判断
-export async function finishNode(state: any): Promise<any> {
-  const score = state.evaluationResult?.overallScore ?? 1;
-  const threshold = 6;
-  const isSuccess = score >= threshold;
-
-  logger.info(`[finishNode] 最终得分 ${score}，结果: ${isSuccess ? "成功" : "未达标"}`);
-
-  // 存储助手消息 (如果还没存)
-  // 把用户消息也存入记忆
-  if (state.context?.sessionId) {
-    conversationMemory.addMessage({
-      sessionId: state.context.sessionId,
-      message: {
-        role: "user",
-        content: state.userQuery.slice(0, 500),
-        timestamp: Date.now(),
-      },
-    });
-  }
-
-  return {
-    status: isSuccess ? "success" : "failed",
-    error: isSuccess ? undefined : `评估得分 ${score} 未达到阈值 ${threshold}`,
-  };
 }

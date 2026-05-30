@@ -54,12 +54,14 @@ export class WorkflowProcessor extends WorkerHost {
         finalState = { ...finalState, ...update };
       }
 
-      const isSuccess = finalState?.status === 'success' || (finalState?.evaluationResult?.overallScore && finalState.evaluationResult.overallScore >= 4);
+      // ✅ 直接使用 Agent 返回的 status，不再自行二次判定
+      const isSuccess = finalState?.status === 'success';
 
       await this.workflowModel.findByIdAndUpdate(workflow._id, {
         status: isSuccess ? 'completed' : 'failed',
         result: finalState as AgentStateType,
-        $unset: { errorMessage: 1 },
+        // ✅ 如果有 error，也一并写入
+        ...(finalState?.error ? { errorMessage: finalState.error } : { $unset: { errorMessage: 1 } }),
       });
 
       return finalState as AgentStateType;
