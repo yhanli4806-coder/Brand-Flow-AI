@@ -1,46 +1,72 @@
-/**
- * 知识库存储 API
- *
- * 接口：
- * - saveToKnowledgeBase: 将素材存入知识库
- * - getKnowledgeBases: 获取可选的知识库列表（保存位置）
- */
-
+// 知识库 API
 import apiClient from './index'
 
-// ============================================================
-// 类型定义
-// ============================================================
-
-/** 存入知识库请求参数 */
-export interface SaveToKbParams {
-  materialName: string
-  tags: string[]
-  targetKbId: string
+// 创建知识库请求参数
+export interface CreateKnowledgeParams {
+  name: string
+  description?: string
 }
 
-/** 知识库选项 */
-export interface KnowledgeBaseOption {
+// 更新知识库请求参数
+export interface UpdateKnowledgeParams {
+  name?: string
+  description?: string
+}
+
+// 导入文本请求参数
+export interface IngestKnowledgeParams {
+  content: string
+}
+
+// 知识库数据
+export interface KnowledgeData {
   id: string
   name: string
+  description?: string
+  createdAt?: string
+  updatedAt?: string
 }
 
-/** 保存结果 */
-export interface SaveResult {
+// 知识记录数据
+export interface KnowledgeRecordData {
   id: string
-  savedAt: string
+  knowledgeId: string
+  content: string
+  createdAt?: string
+  updatedAt?: string
 }
 
-// ============================================================
-// 导出 API 函数
-// ============================================================
-
-/** 将素材存入指定的知识库 */
-export async function saveToKnowledgeBase(params: SaveToKbParams) {
-  return apiClient.post('/knowledge-base/save', params)
+// 创建知识库
+export async function createKnowledge(params: CreateKnowledgeParams) {
+  return apiClient.post('/knowledge', params)
 }
 
-/** 获取可选的知识库列表 */
-export async function getKnowledgeBases() {
-  return apiClient.get('/knowledge-base/list')
+// 获取知识库列表
+export async function getKnowledgeList() {
+  return apiClient.get('/knowledge')
+}
+
+// 获取单个知识库
+export async function getKnowledgeById(id: string) {
+  return apiClient.get(`/knowledge/${id}`)
+}
+
+// 更新知识库
+export async function updateKnowledge(id: string, params: UpdateKnowledgeParams) {
+  return apiClient.put(`/knowledge/${id}`, params)
+}
+
+// 导入文本到知识库
+export async function ingestKnowledge(id: string, params: IngestKnowledgeParams) {
+  return apiClient.post(`/knowledge/${id}/ingest`, params)
+}
+
+// 获取知识库记录
+export async function getKnowledgeRecords(id: string) {
+  return apiClient.get(`/knowledge/${id}/records`)
+}
+
+// 删除知识库
+export async function deleteKnowledge(id: string) {
+  return apiClient.delete(`/knowledge/${id}`)
 }
