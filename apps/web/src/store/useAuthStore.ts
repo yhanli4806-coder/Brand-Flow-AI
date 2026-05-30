@@ -13,7 +13,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { AuthResult } from '@/api/auth'
-import { persist } from 'zustand/middleware'
 
 /** 用户基本信息 */
 interface AuthUser {
