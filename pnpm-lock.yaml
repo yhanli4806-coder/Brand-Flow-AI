@@ -202,6 +202,12 @@ importers:
       '@langchain/openai':
         specifier: ^1.4.7
         version: 1.4.7(@langchain/core@1.1.48(openai@6.39.0(ws@8.20.0)(zod@4.4.3))(ws@8.20.0))(ws@8.20.0)
+      '@langchain/pinecone':
+        specifier: ^1.0.3
+        version: 1.0.3(@langchain/core@1.1.48(openai@6.39.0(ws@8.20.0)(zod@4.4.3))(ws@8.20.0))(@pinecone-database/pinecone@5.1.2)
+      '@langchain/textsplitters':
+        specifier: ^1.0.1
+        version: 1.0.1(@langchain/core@1.1.48(openai@6.39.0(ws@8.20.0)(zod@4.4.3))(ws@8.20.0))
       '@pinecone-database/pinecone':
         specifier: ^5.0.2
         version: 5.1.2
@@ -670,8 +676,21 @@ packages:
     peerDependencies:
       '@langchain/core': ^1.1.48
 
+  '@langchain/pinecone@1.0.3':
+    resolution: {integrity: sha512-enfD7hkbiXzoA3Uq8sRan5PX0I9iLliFTJbkW7MeLf90c5lR1hNj31VN0Ep9OlvmBPgkB1viMObl9rPerAe3gQ==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      '@langchain/core': ^1.1.48
+      '@pinecone-database/pinecone': ^5.0.2
+
   '@langchain/protocol@0.0.15':
     resolution: {integrity: sha512-MllvbpMjqHevUm+v94M422mH7XKN+wGCvJRBVROTWBotEDOATYB4Ktk2UheYP859y9o2LlhtPek5t1T9eyfAbQ==}
+
+  '@langchain/textsplitters@1.0.1':
+    resolution: {integrity: sha512-rheJlB01iVtrOUzttscutRgLybPH9qR79EyzBEbf1u97ljWyuxQfCwIWK+SjoQTM9O8M7GGLLRBSYE26Jmcoww==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      '@langchain/core': ^1.1.48
 
   '@lukeed/csprng@1.1.0':
     resolution: {integrity: sha512-Z7C/xXCiGWsg0KuKsHTKJxbWhpI3Vs5GwLfOean7MGyVFGqdRgBbAjOCh6u4bbjPc/8MJ2pZmK/0DLdCbivLDA==}
@@ -2280,6 +2299,10 @@ packages:
   flat-cache@4.0.1:
     resolution: {integrity: sha512-f7ccFPK3SXFHpx15UIGyRJ/FJQctuKZ0zVuN3frBo4HnK3cay9VEW0R6yPYFHC0AgqhukPzKjq22t5DmAyqGyw==}
     engines: {node: '>=16'}
+
+  flat@5.0.2:
+    resolution: {integrity: sha512-b6suED+5/3rTpUBdG1gupIl8MPFCAMA0QXwmljLhvCUKcUvdE4gWky9zpuGCcXHOsz4J9wPGNWq6OKpmIzz3hQ==}
+    hasBin: true
 
   flatted@3.4.2:
     resolution: {integrity: sha512-PjDse7RzhcPkIJwy5t7KPWQSZ9cAbzQXcafsetQoD7sOJRQlGikNbx7yZp2OotDnJyrDcbyRq3Ttb18iYOqkxA==}
@@ -4315,7 +4338,18 @@ snapshots:
     transitivePeerDependencies:
       - ws
 
+  '@langchain/pinecone@1.0.3(@langchain/core@1.1.48(openai@6.39.0(ws@8.20.0)(zod@4.4.3))(ws@8.20.0))(@pinecone-database/pinecone@5.1.2)':
+    dependencies:
+      '@langchain/core': 1.1.48(openai@6.39.0(ws@8.20.0)(zod@4.4.3))(ws@8.20.0)
+      '@pinecone-database/pinecone': 5.1.2
+      flat: 5.0.2
+
   '@langchain/protocol@0.0.15': {}
+
+  '@langchain/textsplitters@1.0.1(@langchain/core@1.1.48(openai@6.39.0(ws@8.20.0)(zod@4.4.3))(ws@8.20.0))':
+    dependencies:
+      '@langchain/core': 1.1.48(openai@6.39.0(ws@8.20.0)(zod@4.4.3))(ws@8.20.0)
+      js-tiktoken: 1.0.21
 
   '@lukeed/csprng@1.1.0': {}
 
@@ -6139,6 +6173,8 @@ snapshots:
     dependencies:
       flatted: 3.4.2
       keyv: 4.5.4
+
+  flat@5.0.2: {}
 
   flatted@3.4.2: {}
 

@@ -4,10 +4,14 @@
  * 管理：
  * - 登录/注册状态
  * - 用户信息 + token
- * - login / register / logout 三个 action
+ * - setAuth / logout 两个 action
+ *
+ * 使用 zustand/middleware persist 将 token 与用户信息持久化到 localStorage，
+ * 页面刷新后登录状态不丢失。
  */
 
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 import type { AuthResult } from '@/api/auth'
 import { persist } from 'zustand/middleware'
 

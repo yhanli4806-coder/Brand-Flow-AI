@@ -53,6 +53,7 @@ export class WorkflowService implements OnModuleInit, OnModuleDestroy {
 
     await this.workflowQueue.add(RUN_WORKFLOW_JOB, {
       workflowId: workflow._id.toString(),
+      knowledgeId: dto.knowledgeId,
     }, {
       jobId: workflow._id.toString(),
     });

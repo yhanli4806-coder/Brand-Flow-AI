@@ -163,6 +163,24 @@ interface UserInfo {
         }
         ```
 
+*   **`GET /workflow/:id/stream`**
+    *   **说明**: （核心推荐）基于 Server-Sent Events (SSE) 的流式接口，用于实时监听大模型各节点的执行状态与结果。取代了传统的 `/status` 轮询方式。
+    *   **路径参数**: `id` (目标工作流的实例 ID)
+    *   **返回格式**: `text/event-stream` (流式输出)
+    *   **事件返回包格式 (JSON)**:
+        *   **`progress`** 事件 (单个节点执行完毕):
+            ```typescript
+            { type: 'progress', data: Record<string, any> } // data 为当前刚执行完毕的节点(如 intentNode, promptNode)生成的具体状态内容
+            ```
+        *   **`completed`** 事件 (全流程通过):
+            ```typescript
+            { type: 'completed', data: Record<string, any> } // data 为整个工作流全部完成后的最终完整结果
+            ```
+        *   **`failed`** 事件 (流程中断或未达标):
+            ```typescript
+            { type: 'failed', error: string } // error 为流程崩溃的具体原因
+            ```
+
 *   **`GET /workflow/:id/status`**
     *   **说明**: 轮询此接口以获取异步执行状态和最终大模型生成的提示词。
     *   **路径参数**: `id` (目标工作流的实例 ID)
@@ -193,4 +211,58 @@ interface UserInfo {
             status: "success" | "failed" // 单个链的执行状态
           }
         }
+        ```
+
+---
+
+### 知识库与向量检索模块 (/knowledge)
+
+*   **`POST /knowledge`**
+    *   **说明**: 为当前企业创建一个新的知识库。
+    *   **Body**: 
+        ```typescript
+        { 
+          name: string,          // 知识库名称
+          description?: string   // 知识库描述
+        }
+        ```
+
+*   **`GET /knowledge`**
+    *   **说明**: 获取当前企业下的所有知识库列表。
+    *   **返回 Data**: 
+        ```typescript
+        Array<{ _id: string, name: string, description: string }>
+        ```
+
+*   **`DELETE /knowledge/:id`**
+    *   **说明**: 删除指定的知识库，不仅删除 MongoDB 记录，后续还会同步清空 Pinecone 中对应的底层向量切片数据。
+    *   **路径参数**: `id` (要删除的知识库 ID)
+
+*   **`POST /knowledge/:id/ingest`**
+    *   **说明**: 将大段品牌规范/忌讳文本粉碎、切片、Embedding，并打上对应的标签存入 Pinecone 的专属 Namespace 中。
+    *   **路径参数**: `id` (目标知识库 ID)
+    *   **Body**: 
+        ```typescript
+        { 
+          content: string   // 需要入库的长文本内容
+        }
+        ```
+    *   **返回 Data**: 
+        ```typescript
+        { 
+          success: boolean, 
+          chunks: number    // 本次成功切出的向量块数量
+        }
+        ```
+
+*   **`GET /knowledge/:id/records`**
+    *   **说明**: （高级诊断接口）从底层的 Pinecone 向量数据库中，利用 `listPaginated` 暴力遍历并拉取当前知识库名下的所有向量切片明细。
+    *   **路径参数**: `id` (目标知识库 ID)
+    *   **返回 Data**: 
+        ```typescript
+        Array<{
+          id: string,       // Pinecone 中存储的 Vector Chunk ID
+          text: string,     // 该向量对应的明文切片
+          metadata: any     // 元数据信息（包含 enterpriseId, knowledgeId 等）
+        }>
         ```
