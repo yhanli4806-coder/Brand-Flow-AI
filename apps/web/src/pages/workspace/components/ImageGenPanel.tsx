@@ -106,18 +106,18 @@ const ImageGenPanel = ({
       <div className={styles.genPreviewSection}>
         <h3 className={styles.rightSectionTitle}>底图预览</h3>
         <div className={styles.genPreviewBox}>
-          {isExecuting ? (
-            <div className={styles.genPreviewLoading}>
-              <div className={styles.genSpinner} />
-              <span>正在生成...</span>
-            </div>
-          ) : baseImageUrl ? (
+          {baseImageUrl ? (
             <img
               className={styles.genPreviewImage}
               src={baseImageUrl}
               alt="生成底图"
               onClick={() => window.open(baseImageUrl, '_blank')}
             />
+          ) : isExecuting ? (
+            <div className={styles.genPreviewLoading}>
+              <div className={styles.genSpinner} />
+              <span>正在生成...</span>
+            </div>
           ) : (
             <div className={styles.genPreviewPlaceholder}>
               等待执行图像生成
