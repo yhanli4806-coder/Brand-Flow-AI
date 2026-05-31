@@ -4,9 +4,19 @@
   "type": "module",
   "packageManager": "pnpm@10.29.3",
   "scripts": {
-    "dev": "turbo run dev",
+    "dev": "pnpm dev:deps && turbo run dev",
+    "dev:all": "node scripts/dev-start.mjs",
+    "start": "pnpm dev:all",
+    "dev:code": "turbo run dev",
+    "dev:deps": "node scripts/dev-deps.mjs",
+    "dev:deps:down": "node scripts/dev-deps.mjs down",
     "build": "turbo run build",
     "lint": "turbo run lint"
+  },
+  "pnpm": {
+    "overrides": {
+      "@langchain/core": "^1.1.48"
+    }
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

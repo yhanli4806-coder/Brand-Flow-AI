@@ -14,23 +14,23 @@ import apiClient from './index'
 
 /** 登录请求参数 */
 export interface LoginParams {
-  email: string    // 企业邮箱
+  email: string // 企业邮箱
   password: string // 登录密码
 }
 
 /** 注册请求参数 */
 export interface RegisterParams {
-  name: string            // 用户姓名
-  email: string           // 企业邮箱
-  password: string        // 登录密码
+  name: string // 用户姓名
+  email: string // 企业邮箱
+  password: string // 登录密码
   confirmPassword: string // 确认密码（用于前端校验）
 }
 
 /** 认证成功返回的数据结构 */
 export interface AuthResult {
-  token: string                 // JWT token，后续请求携带用于身份验证
+  token: string // JWT token，后续请求携带用于身份验证
   user: {
-    name: string  // 用户显示名称
+    name: string // 用户显示名称
     email: string // 用户邮箱
   }
 }
@@ -74,11 +74,14 @@ function toAuthResult(backend: BackendLoginData): AuthResult {
  * - 后端 TransformInterceptor 将响应包装为 { success, data, message }
  *   其中 data = { access_token, user }
  * - axios 响应拦截器已执行 response.data
- * - 所以 apiClient.post 返回的是 { success, data: { access_token, user }, message }
+ * - 所以 apiClient.post 返回的是 { success: true, data: BackendLoginData, message: "success" }
  * - 需要取 res.data 获取 BackendLoginData
  */
 async function realLogin(params: LoginParams) {
-  const res = await apiClient.post<{ success: boolean; data: BackendLoginData }>('/auth/login', params)
+  const res = await apiClient.post<{ success: boolean; data: BackendLoginData }>(
+    '/auth/login',
+    params,
+  )
   return {
     success: true,
     data: toAuthResult(res.data),

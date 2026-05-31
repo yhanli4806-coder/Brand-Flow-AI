@@ -1,1 +1,2 @@
-export const generatePlaceholder = { mode: 'stub' }
+export * from "./generate-types";
+export * from "./generate-service";
