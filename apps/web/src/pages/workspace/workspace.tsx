@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { ReactFlowProvider } from 'reactflow'
+import { message } from 'antd'
 import { SwitchTabs } from '../../components/SwitchTabs'
 import {
   DEFAULT_TAGS,
@@ -72,6 +73,7 @@ const Workspace = () => {
   /* ---- 标签 / 保存知识库弹窗 ---- */
   const [tags, setTags] = useState<string[]>([...DEFAULT_TAGS])
   const [isSaveModalVisible, setIsSaveModalVisible] = useState(false)
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false)
 
   /* ===== 工作流生命周期：从 store 读取 ===== */
   const {
@@ -431,6 +433,26 @@ const Workspace = () => {
     return '等待开始'
   })()
 
+  const handleSaveImage = async () => {
+    const url = imageUrl || baseImageUrl
+    if (!url) return
+    try {
+      const response = await fetch(url)
+      const blob = await response.blob()
+      const objectUrl = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = objectUrl
+      a.download = `brand-flow-${Date.now()}.png`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(objectUrl)
+      message.success('图片已保存')
+    } catch {
+      message.error('保存失败，请重试')
+    }
+  }
+
   /* ============================
       渲染右侧属性面板
    ============================ */
@@ -560,15 +582,53 @@ const Workspace = () => {
             </div>
           ) : (
             <div className={styles.previewArea}>
+              <div className={styles.previewToolbar}>
+                <div className={styles.previewToolGroup}>
+                  {baseImageUrl && (
+                    <button
+                      type="button"
+                      className={styles.saveImageBtn}
+                      onClick={handleSaveImage}
+                    >
+                      保存图片
+                    </button>
+                  )}
+                </div>
+              </div>
               <div className={styles.previewCanvas}>
-                {baseImageUrl && (
+                {baseImageUrl ? (
                   <img
+                    className={styles.previewImage}
                     src={baseImageUrl}
                     alt="生成海报"
-                    style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                    onClick={() => setIsLightboxOpen(true)}
                   />
+                ) : (
+                  <span style={{ color: '#b0b7c7', fontSize: 14, fontWeight: 500 }}>
+                    {isExecuting ? '正在生成...' : '海报预览区域'}
+                  </span>
                 )}
               </div>
+            </div>
+          )}
+
+          {/* 图片放大灯箱 */}
+          {isLightboxOpen && baseImageUrl && (
+            <div
+              className={styles.imageLightbox}
+              onClick={() => setIsLightboxOpen(false)}
+            >
+              <button
+                className={styles.lightboxClose}
+                onClick={() => setIsLightboxOpen(false)}
+              >
+                ×
+              </button>
+              <img
+                src={baseImageUrl}
+                alt="生成海报"
+                onClick={(e) => e.stopPropagation()}
+              />
             </div>
           )}
         </section>
